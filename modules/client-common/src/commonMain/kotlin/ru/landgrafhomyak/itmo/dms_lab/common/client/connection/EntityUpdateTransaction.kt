@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.common.storage
+package ru.landgrafhomyak.itmo.dms_lab.common.client.connection
 
 import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityAttributeDescriptor
 

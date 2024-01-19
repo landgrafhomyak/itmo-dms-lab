@@ -1,9 +1,12 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.common.storage
+package ru.landgrafhomyak.itmo.dms_lab.common.client.connection
 
 import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityAttributeDescriptor
 
 interface EntityInstance {
     val descriptor: EntityAttributeDescriptor
+
+    fun release()
+
     operator fun get(attribute: EntityAttributeDescriptor.Reference.Nullable): EntityInstance?
     operator fun get(attribute: EntityAttributeDescriptor.Reference.NotNull): EntityInstance
     operator fun get(attribute: EntityAttributeDescriptor.IntAttribute.Nullable): Long?

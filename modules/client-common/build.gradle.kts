@@ -8,7 +8,11 @@ kotlin {
         withJava()
     }
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":modules:common"))
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
