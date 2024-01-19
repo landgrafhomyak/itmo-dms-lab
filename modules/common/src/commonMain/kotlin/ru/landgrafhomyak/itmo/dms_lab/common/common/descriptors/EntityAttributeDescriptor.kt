@@ -1,23 +1,47 @@
 package ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors
 
-sealed interface EntityAttributeDescriptor {
-    val isNullable: Boolean
 
-    interface Reference : EntityAttributeDescriptor {
-        val targetEntity: EntityDescriptor
+@Suppress("RemoveRedundantQualifierName", "EqualsOrHashCode")
+sealed class EntityAttributeDescriptor(val isNullable: Boolean) {
+    final override fun equals(other: Any?): Boolean = this === other
+
+    sealed class Reference(
+        val targetEntity: EntityDescriptor,
+        isNullable: Boolean
+    ) : EntityAttributeDescriptor(isNullable) {
+
+        class Nullable(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.Reference(targetEntity, true)
+
+        class NotNull(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.Reference(targetEntity, false)
     }
 
-    interface IntAttribute : EntityAttributeDescriptor {
-        fun checkValid(value: Long): Boolean
+    sealed class IntAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+        abstract fun checkValid(value: Long): Boolean
+
+        abstract class Nullable : EntityAttributeDescriptor.IntAttribute(true)
+
+        abstract class NotNull : EntityAttributeDescriptor.IntAttribute(false)
     }
 
-    interface FloatAttribute : EntityAttributeDescriptor {
-        fun checkValid(value: Double): Boolean
+    sealed class FloatAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+        abstract fun checkValid(value: Double): Boolean
+
+        abstract class Nullable : EntityAttributeDescriptor.FloatAttribute(true)
+
+        abstract class NotNull : EntityAttributeDescriptor.FloatAttribute(false)
     }
 
-    interface StringAttribute : EntityAttributeDescriptor {
-        fun checkValid(value: String): Boolean
+    sealed class StringAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+        abstract fun checkValid(value: String): Boolean
+
+        abstract class Nullable : EntityAttributeDescriptor.StringAttribute(true)
+
+        abstract class NotNull : EntityAttributeDescriptor.StringAttribute(false)
     }
 
-    sealed interface BooleanAttribute : EntityAttributeDescriptor
+    sealed class BooleanAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+        object Nullable : EntityAttributeDescriptor.BooleanAttribute(true)
+
+        object NotNull : EntityAttributeDescriptor.BooleanAttribute(false)
+    }
 }
