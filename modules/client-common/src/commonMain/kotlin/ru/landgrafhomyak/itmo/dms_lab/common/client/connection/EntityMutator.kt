@@ -4,8 +4,9 @@ import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityAttributeD
 import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityDescriptor
 
 interface EntityMutator {
-    operator fun set(attribute: EntityAttributeDescriptor.InnerEntity.Nullable, value: EntityInstance?)
-    operator fun set(attribute: EntityAttributeDescriptor.InnerEntity.NotNull, value: EntityInstance)
+    val descriptor: EntityDescriptor
+    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.Nullable): EntityMutator?
+    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.NotNull): EntityMutator
     operator fun set(attribute: EntityAttributeDescriptor.IntAttribute.Nullable, value: Long?)
     operator fun set(attribute: EntityAttributeDescriptor.IntAttribute.NotNull, value: Long)
     operator fun set(attribute: EntityAttributeDescriptor.FloatAttribute.Nullable, value: Double?)

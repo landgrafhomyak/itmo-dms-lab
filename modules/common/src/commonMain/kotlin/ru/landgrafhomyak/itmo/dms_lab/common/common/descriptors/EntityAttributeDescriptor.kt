@@ -2,46 +2,46 @@ package ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors
 
 
 @Suppress("RemoveRedundantQualifierName", "EqualsOrHashCode")
-sealed class EntityAttributeDescriptor(val isNullable: Boolean) {
+sealed class EntityAttributeDescriptor(val name: String, val isNullable: Boolean) {
     final override fun equals(other: Any?): Boolean = this === other
 
     sealed class InnerEntity(
         val targetEntity: EntityDescriptor,
+        name: String,
         isNullable: Boolean
-    ) : EntityAttributeDescriptor(isNullable) {
+    ) : EntityAttributeDescriptor(name, isNullable) {
+        class Nullable(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, name, true)
 
-        class Nullable(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, true)
-
-        class NotNull(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, false)
+        class NotNull(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, name, false)
     }
 
-    sealed class IntAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+    sealed class IntAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {
         abstract fun checkValid(value: Long): Boolean
 
-        abstract class Nullable : EntityAttributeDescriptor.IntAttribute(true)
+        abstract class Nullable(name: String) : EntityAttributeDescriptor.IntAttribute(name, true)
 
-        abstract class NotNull : EntityAttributeDescriptor.IntAttribute(false)
+        abstract class NotNull(name: String) : EntityAttributeDescriptor.IntAttribute(name, false)
     }
 
-    sealed class FloatAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+    sealed class FloatAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {
         abstract fun checkValid(value: Double): Boolean
 
-        abstract class Nullable : EntityAttributeDescriptor.FloatAttribute(true)
+        abstract class Nullable(name: String) : EntityAttributeDescriptor.FloatAttribute(name, true)
 
-        abstract class NotNull : EntityAttributeDescriptor.FloatAttribute(false)
+        abstract class NotNull(name: String) : EntityAttributeDescriptor.FloatAttribute(name, false)
     }
 
-    sealed class StringAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
+    sealed class StringAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {
         abstract fun checkValid(value: String): Boolean
 
-        abstract class Nullable : EntityAttributeDescriptor.StringAttribute(true)
+        abstract class Nullable(name: String) : EntityAttributeDescriptor.StringAttribute(name, true)
 
-        abstract class NotNull : EntityAttributeDescriptor.StringAttribute(false)
+        abstract class NotNull(name: String) : EntityAttributeDescriptor.StringAttribute(name, false)
     }
 
-    sealed class BooleanAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {
-        object Nullable : EntityAttributeDescriptor.BooleanAttribute(true)
+    sealed class BooleanAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor( name, isNullable) {
+        class Nullable(name: String) : EntityAttributeDescriptor.BooleanAttribute(name, true)
 
-        object NotNull : EntityAttributeDescriptor.BooleanAttribute(false)
+        class NotNull(name: String) : EntityAttributeDescriptor.BooleanAttribute(name , false)
     }
 }
