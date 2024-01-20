@@ -5,14 +5,14 @@ package ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors
 sealed class EntityAttributeDescriptor(val isNullable: Boolean) {
     final override fun equals(other: Any?): Boolean = this === other
 
-    sealed class Reference(
+    sealed class InnerEntity(
         val targetEntity: EntityDescriptor,
         isNullable: Boolean
     ) : EntityAttributeDescriptor(isNullable) {
 
-        class Nullable(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.Reference(targetEntity, true)
+        class Nullable(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, true)
 
-        class NotNull(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.Reference(targetEntity, false)
+        class NotNull(targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, false)
     }
 
     sealed class IntAttribute(isNullable: Boolean) : EntityAttributeDescriptor(isNullable) {

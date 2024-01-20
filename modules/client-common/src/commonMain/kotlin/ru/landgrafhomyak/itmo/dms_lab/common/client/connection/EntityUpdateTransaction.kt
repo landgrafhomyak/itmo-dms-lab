@@ -5,8 +5,8 @@ import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityAttributeD
 interface EntityUpdateTransaction {
     suspend fun commit()
     suspend fun rollback()
-    operator fun set(attribute: EntityAttributeDescriptor.Reference.Nullable, value: EntityInstance?)
-    operator fun set(attribute: EntityAttributeDescriptor.Reference.NotNull, value: EntityInstance)
+    operator fun set(attribute: EntityAttributeDescriptor.InnerEntity.Nullable, value: EntityInstance?)
+    operator fun set(attribute: EntityAttributeDescriptor.InnerEntity.NotNull, value: EntityInstance)
     operator fun set(attribute: EntityAttributeDescriptor.IntAttribute.Nullable, value: Long?)
     operator fun set(attribute: EntityAttributeDescriptor.IntAttribute.NotNull, value: Long)
     operator fun set(attribute: EntityAttributeDescriptor.FloatAttribute.Nullable, value: Double?)

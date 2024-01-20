@@ -7,8 +7,8 @@ interface EntityInstance {
 
     fun release()
 
-    operator fun get(attribute: EntityAttributeDescriptor.Reference.Nullable): EntityInstance?
-    operator fun get(attribute: EntityAttributeDescriptor.Reference.NotNull): EntityInstance
+    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.Nullable): EntityInstance?
+    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.NotNull): EntityInstance
     operator fun get(attribute: EntityAttributeDescriptor.IntAttribute.Nullable): Long?
     operator fun get(attribute: EntityAttributeDescriptor.IntAttribute.NotNull): Long
     operator fun get(attribute: EntityAttributeDescriptor.FloatAttribute.Nullable): Double?
