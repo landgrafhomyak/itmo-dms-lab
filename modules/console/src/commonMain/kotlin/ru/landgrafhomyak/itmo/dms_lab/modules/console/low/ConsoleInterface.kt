@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.client.console.io
+package ru.landgrafhomyak.itmo.dms_lab.modules.console.low
 
 interface ConsoleInterface {
     @Suppress("SpellCheckingInspection")
@@ -8,7 +8,5 @@ interface ConsoleInterface {
 
     fun println(s: String)
 
-    fun setColor(color: ConsoleColor)
-
-    fun setUnderline(underline: Boolean)
+    fun setStyle(style: ConsoleTextStyle)
 }
