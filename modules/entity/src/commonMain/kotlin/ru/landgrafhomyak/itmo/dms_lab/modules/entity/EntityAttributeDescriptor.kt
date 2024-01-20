@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors
+package ru.landgrafhomyak.itmo.dms_lab.modules.entity
 
 
 @Suppress("RemoveRedundantQualifierName", "EqualsOrHashCode")
@@ -39,9 +39,20 @@ sealed class EntityAttributeDescriptor(val name: String, val isNullable: Boolean
         abstract class NotNull(name: String) : EntityAttributeDescriptor.StringAttribute(name, false)
     }
 
-    sealed class BooleanAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor( name, isNullable) {
+    sealed class BooleanAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {
         class Nullable(name: String) : EntityAttributeDescriptor.BooleanAttribute(name, true)
 
-        class NotNull(name: String) : EntityAttributeDescriptor.BooleanAttribute(name , false)
+        class NotNull(name: String) : EntityAttributeDescriptor.BooleanAttribute(name, false)
+    }
+
+    sealed class EnumAttribute<T : Enum<T>>(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {
+
+        abstract fun valueToString(v: T): String
+
+        abstract fun valueFromString(s: String): T?
+
+        abstract class Nullable<T : Enum<T>>(name: String) : EntityAttributeDescriptor.EnumAttribute<T>(name, true)
+
+        abstract class NotNull<T : Enum<T>>(name: String) : EntityAttributeDescriptor.EnumAttribute<T>(name, false)
     }
 }
