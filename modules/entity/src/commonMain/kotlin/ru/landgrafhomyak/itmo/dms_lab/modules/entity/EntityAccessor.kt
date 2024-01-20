@@ -1,14 +1,9 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.client.connection
+package ru.landgrafhomyak.itmo.dms_lab.modules.entity
 
-import ru.landgrafhomyak.itmo.dms_lab.common.common.descriptors.EntityAttributeDescriptor
-
-interface EntityInstance {
+interface EntityAccessor {
     val descriptor: EntityAttributeDescriptor
-
-    fun release()
-
-    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.Nullable): EntityInstance?
-    operator fun get(attribute: EntityAttributeDescriptor.InnerEntity.NotNull): EntityInstance
+    operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Nullable): EntityAccessor?
+    operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.NotNull): EntityAccessor
     operator fun get(attribute: EntityAttributeDescriptor.IntAttribute.Nullable): Long?
     operator fun get(attribute: EntityAttributeDescriptor.IntAttribute.NotNull): Long
     operator fun get(attribute: EntityAttributeDescriptor.FloatAttribute.Nullable): Double?
@@ -17,4 +12,6 @@ interface EntityInstance {
     operator fun get(attribute: EntityAttributeDescriptor.StringAttribute.NotNull): String
     operator fun get(attribute: EntityAttributeDescriptor.BooleanAttribute.Nullable): Boolean?
     operator fun get(attribute: EntityAttributeDescriptor.BooleanAttribute.NotNull): Boolean
+    operator fun <T:Enum<T>>get(attribute: EntityAttributeDescriptor.EnumAttribute.Nullable<T>): T?
+    operator fun <T:Enum<T>>get(attribute: EntityAttributeDescriptor.EnumAttribute.NotNull<T>): T
 }

@@ -5,14 +5,14 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.entity
 sealed class EntityAttributeDescriptor(val name: String, val isNullable: Boolean) {
     final override fun equals(other: Any?): Boolean = this === other
 
-    sealed class InnerEntity(
+    sealed class ComplexAttribute(
         val targetEntity: EntityDescriptor,
         name: String,
         isNullable: Boolean
     ) : EntityAttributeDescriptor(name, isNullable) {
-        class Nullable(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, name, true)
+        class Nullable(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, true)
 
-        class NotNull(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.InnerEntity(targetEntity, name, false)
+        class NotNull(name: String, targetEntity: EntityDescriptor) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, false)
     }
 
     sealed class IntAttribute(name: String, isNullable: Boolean) : EntityAttributeDescriptor(name, isNullable) {

@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.common.client.console.engine
+package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
 
 internal class ArgsParser(private val data: String) : Iterator<String> {
     private var pos = 0
@@ -8,6 +8,7 @@ internal class ArgsParser(private val data: String) : Iterator<String> {
         if (this.pos >= this.data.length) return
         val sb = StringBuilder()
         var insideQuote = false
+        var argExists = false
 
         loop@ while (this.pos < this.data.length && this.data[this.pos].isWhitespace())
             this.pos++
@@ -33,9 +34,10 @@ internal class ArgsParser(private val data: String) : Iterator<String> {
 
                 else -> sb.append(c)
             }
+            argExists = true
             this.pos++
         }
-        if (sb.isEmpty()) return
+        if (!argExists) return
         this.next = sb.toString()
     }
 
