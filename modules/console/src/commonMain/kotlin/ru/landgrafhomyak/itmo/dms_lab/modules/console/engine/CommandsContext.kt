@@ -13,20 +13,20 @@ interface CommandsContext {
      * be dropped without notifying.
      */
     interface EntityCreatorForCommand : EntityMutator {
-        override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Nullable): CommandsContext.EntityCreatorForCommand?
-        override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.NotNull): CommandsContext.EntityCreatorForCommand
+        override operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional): CommandsContext.EntityCreatorForCommand?
+        override operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Required): CommandsContext.EntityCreatorForCommand
     }
 
     /**
      * Returns [entity constructor][CommandsContext.EntityCreatorForCommand] that must be filled by caller
      * if command expects entity (and only entity) as its argument, otherwise returns `null`.
      */
-    fun isEntityCommand(commandName: String):  CommandsContext.EntityCreatorForCommand?
+    fun isEntityCommand(commandName: String): CommandsContext.EntityCreatorForCommand?
 
     /**
      * Called if previous [CommandsContext.isEntityCommand] call returned creator.
      */
-    fun executeCommand(console: ConsoleInterface, commandName: String, entity:  CommandsContext.EntityCreatorForCommand)
+    fun executeCommand(console: ConsoleInterface, commandName: String, entity: CommandsContext.EntityCreatorForCommand)
 
     /**
      * Called if previous [CommandsContext.isEntityCommand] call returned `null`.

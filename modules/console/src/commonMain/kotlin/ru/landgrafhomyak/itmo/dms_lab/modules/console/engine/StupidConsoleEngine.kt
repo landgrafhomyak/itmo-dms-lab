@@ -38,7 +38,7 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
     }
 
     private fun fillEntity(entity: CommandsContext.EntityCreatorForCommand, args: List<String>, depth: UInt = 1u): Boolean {
-        val primitive = ArrayList<EntityAttributeDescriptor>()
+        val primitive = ArrayList<EntityAttributeDescriptor<*, *>>()
         val complex = ArrayList<EntityAttributeDescriptor.ComplexAttribute>()
         for (attr in entity.descriptor) {
             if (attr is EntityAttributeDescriptor.ComplexAttribute)
@@ -61,14 +61,14 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
         for ((d, a) in (primitive zip args)) {
             when (d) {
                 is EntityAttributeDescriptor.IntAttribute -> {
-                    if (a.isEmpty() && d is EntityAttributeDescriptor.IntAttribute.Nullable) {
+                    if (a.isEmpty() && d is EntityAttributeDescriptor.IntAttribute.Optional) {
                         entity[d] = null
                     } else {
                         val v = this.catchIAE(d.name) { a.toLong() } ?: return false
                         if (!d.checkValid(v)) {
                             this.console.setStyle(ConsoleTextStyle.ERROR)
                             this.console.println("Attribute '${d.name}' has wrong value")
-                            if (d is EntityAttributeDescriptor.IntAttribute.Nullable) {
+                            if (d is EntityAttributeDescriptor.IntAttribute.Optional) {
                                 this.console.setStyle(ConsoleTextStyle.TIP)
                                 this.console.println("To pass optional argument write \"\"")
                             }
@@ -80,7 +80,7 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
                 }
 
                 is EntityAttributeDescriptor.FloatAttribute -> {
-                    if (a.isEmpty() && d is EntityAttributeDescriptor.FloatAttribute.Nullable) {
+                    if (a.isEmpty() && d is EntityAttributeDescriptor.FloatAttribute.Optional) {
                         entity[d] = null
                     } else {
                         val v = this.catchIAE(d.name) { a.toDouble() } ?: return false
@@ -88,7 +88,7 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
                         if (!d.checkValid(v)) {
                             this.console.setStyle(ConsoleTextStyle.ERROR)
                             this.console.println("Attribute '${d.name}' has wrong value")
-                            if (d is EntityAttributeDescriptor.FloatAttribute.Nullable) {
+                            if (d is EntityAttributeDescriptor.FloatAttribute.Optional) {
                                 this.console.setStyle(ConsoleTextStyle.TIP)
                                 this.console.println("To pass optional argument write \"\"")
                             }
@@ -100,13 +100,13 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
                 }
 
                 is EntityAttributeDescriptor.StringAttribute -> {
-                    if (a.isEmpty() && d is EntityAttributeDescriptor.StringAttribute.Nullable) {
+                    if (a.isEmpty() && d is EntityAttributeDescriptor.StringAttribute.Optional) {
                         entity[d] = null
                     } else {
                         if (!d.checkValid(a)) {
                             this.console.setStyle(ConsoleTextStyle.ERROR)
                             this.console.println("Attribute '${d.name}' has wrong value")
-                            if (d is EntityAttributeDescriptor.StringAttribute.Nullable) {
+                            if (d is EntityAttributeDescriptor.StringAttribute.Optional) {
                                 this.console.setStyle(ConsoleTextStyle.TIP)
                                 this.console.println("To pass optional argument write \"\"")
                             }
@@ -118,7 +118,7 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
                 }
 
                 is EntityAttributeDescriptor.BooleanAttribute -> when (a.toLowerCase()) {
-                    "" -> if (d is EntityAttributeDescriptor.BooleanAttribute.Nullable)
+                    "" -> if (d is EntityAttributeDescriptor.BooleanAttribute.Optional)
                         entity[d] = null
 
                     "+", "true" -> entity[d] = true
@@ -133,14 +133,14 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
                 }
 
                 is EntityAttributeDescriptor.EnumAttribute<*> -> {
-                    if (a.isEmpty() && d is EntityAttributeDescriptor.EnumAttribute.Nullable<*>) {
+                    if (a.isEmpty() && d is EntityAttributeDescriptor.EnumAttribute.Optional<*>) {
                         entity[d] = null
                     } else {
                         val v = d.valueFromString(a)
                         if (v == null) {
                             this.console.setStyle(ConsoleTextStyle.ERROR)
                             this.console.println("Attribute '${d.name}' has wrong value")
-                            if (d is EntityAttributeDescriptor.EnumAttribute.Nullable<*>) {
+                            if (d is EntityAttributeDescriptor.EnumAttribute.Optional<*>) {
                                 this.console.setStyle(ConsoleTextStyle.TIP)
                                 this.console.println("To pass optional argument write \"\"")
                             }
@@ -157,8 +157,8 @@ class StupidConsoleEngine(private val console: ConsoleInterface, private val com
             val recEntity: CommandsContext.EntityCreatorForCommand
             @Suppress("LiftReturnOrAssignment")
             when (d) {
-                is EntityAttributeDescriptor.ComplexAttribute.NotNull -> recEntity = entity[d]
-                is EntityAttributeDescriptor.ComplexAttribute.Nullable -> recEntity = entity[d] ?: continue
+                is EntityAttributeDescriptor.ComplexAttribute.Required -> recEntity = entity[d]
+                is EntityAttributeDescriptor.ComplexAttribute.Optional -> recEntity = entity[d] ?: continue
             }
             this.console.setStyle(ConsoleTextStyle.UTILITY)
             this.console.print("${">".repeat(depth.toInt())} {${d.targetEntity.name}} ")
