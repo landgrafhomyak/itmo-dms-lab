@@ -15,15 +15,15 @@ interface EntityCreationTransaction : EntityMutator {
     /**
      * Passes a created object to storage and closes transaction.
      */
-    fun finishCreating()
+    suspend fun finishCreating()
 
     /**
      * Passes a created object to storage ***if it is [less][EntityDescriptor.compare] than any object in storage***
      */
-    fun finishCreatingIfMin()
+    suspend fun finishCreatingIfMin()
 
     /**
      * Passes a created object to storage ***if it is [greater][EntityDescriptor.compare] than any object in storage***
      */
-    fun finishCreatingIfMax()
+    suspend fun finishCreatingIfMax()
 }

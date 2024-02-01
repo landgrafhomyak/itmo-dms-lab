@@ -9,7 +9,7 @@ interface StorageClientLayer {
     /**
      * Commit all changes into storage.
      */
-    /* suspend */ fun commit()
+    suspend fun commit()
 
     /**
      * Discards all changes since previous commit or rollback.
@@ -29,20 +29,20 @@ interface StorageClientLayer {
     /**
      * Starts transaction for an object with specified [ordinal][id]
      */
-    /* suspend */ fun startActionById(id: UInt): ActionTransaction?
+    suspend fun startActionById(id: UInt): ActionTransaction?
 
     /**
      * Groups entities by [specified attribute][attr] and returns quantity of entities in each group.
      */
-    /* suspend */ fun <T : Any> countByGroup(attr: EntityAttributeDescriptor<T, *>): CountByGroupFetcher<T>
+    suspend fun <T : Any> countByGroup(attr: EntityAttributeDescriptor<T, *>): CountByGroupFetcher<T>
 
     /**
      * Reorders entities in storage in random order.
      */
-    /* suspend */ fun shuffleInline()
+    suspend fun shuffleInline()
 
     /**
      * Reverses order of entities in storage
      */
-    /* suspend */ fun reverseInline()
+    suspend fun reverseInline()
 }

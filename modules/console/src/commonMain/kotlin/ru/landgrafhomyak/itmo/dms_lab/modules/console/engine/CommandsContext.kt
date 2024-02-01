@@ -26,10 +26,10 @@ interface CommandsContext {
     /**
      * Called if previous [CommandsContext.isEntityCommand] call returned creator.
      */
-    fun executeCommand(console: ConsoleInterface, commandName: String, entity: CommandsContext.EntityCreatorForCommand)
+    suspend fun executeCommand(console: ConsoleInterface, commandName: String, entity: CommandsContext.EntityCreatorForCommand)
 
     /**
      * Called if previous [CommandsContext.isEntityCommand] call returned `null`.
      */
-    fun executeCommand(console: ConsoleInterface, commandName: String, args: List<String>)
+    suspend fun executeCommand(console: ConsoleInterface, commandName: String, args: List<String>)
 }

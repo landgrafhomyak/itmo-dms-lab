@@ -10,7 +10,7 @@ interface ActionTransaction {
     /**
      * Deletes collected objects and closes transaction.
      */
-    /* suspend */ fun delete()
+    suspend fun delete()
 
     /**
      * Returns object that allows to read collected objects.
@@ -20,22 +20,22 @@ interface ActionTransaction {
      *
      * After function calling this object becomes invalid to call any method on it.
      */
-    /* suspend */ fun select(vararg attributes: EntityAttributeDescriptor<*, *>): StorageEntityFetcher
+    suspend fun select(vararg attributes: EntityAttributeDescriptor<*, *>): StorageEntityFetcher
 
     /**
      * Returns object that allows to read and edit collected objects.
      *
      * After function calling this object becomes invalid to call any method on it.
      */
-    /* suspend */ fun update(): StorageEntityUpdater
+    suspend fun update(): StorageEntityUpdater
 
     /**
      * Returns quantity of collected objects and closes transaction.
      */
-    /* suspend */ fun count(): UInt
+    suspend fun count(): UInt
 
     /**
      * Does nothing and closes transaction.
      */
-    /* suspend */ fun abort()
+    suspend fun abort()
 }

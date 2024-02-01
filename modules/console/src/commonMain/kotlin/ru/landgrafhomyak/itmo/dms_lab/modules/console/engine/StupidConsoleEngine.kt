@@ -6,8 +6,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import java.util.IllegalFormatCodePointException
 
 class StupidConsoleEngine(private val console: ConsoleInterface, private val commandsContext: CommandsContext) {
-    @Suppress("SpellCheckingInspection")
-    fun mainloop() {
+    suspend fun mainloop() {
         while (true) {
             this.console.setStyle(ConsoleTextStyle.UTILITY)
             this.console.print("> ")

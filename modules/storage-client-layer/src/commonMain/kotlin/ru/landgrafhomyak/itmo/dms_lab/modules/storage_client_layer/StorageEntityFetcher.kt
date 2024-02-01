@@ -14,13 +14,13 @@ interface StorageEntityFetcher : EntityAccessor {
      * Returns `false` if all entities already fetched.
      * In this case, the transaction is closed and an object becomes invalid.
      */
-    /* suspend */ fun next()
+     suspend  fun next()
 
     /**
      * If transaction not ended, closes it.
      * @throws IllegalStateException if the transaction was ended or aborted before.
      */
-    /* suspend */ fun abortFetching()
+    suspend  fun abortFetching()
 
     /**
      * Copies all attributes of the current entity into specified mutator.

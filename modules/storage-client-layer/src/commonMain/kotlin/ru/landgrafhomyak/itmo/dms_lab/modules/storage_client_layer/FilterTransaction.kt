@@ -48,5 +48,5 @@ interface FilterTransaction {
     /**
      * Applies all collected filters and returns object to perform action. This object becomes invalid.
      */
-    /* suspend */ fun `do`(): ActionTransaction
+    suspend  fun `do`(): ActionTransaction
 }

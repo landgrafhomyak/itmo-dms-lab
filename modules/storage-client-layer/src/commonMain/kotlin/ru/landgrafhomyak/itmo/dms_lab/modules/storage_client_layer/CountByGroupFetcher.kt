@@ -15,7 +15,7 @@ interface CountByGroupFetcher<T : Any> {
      * Quantity of entities in a group with key `null`.
      * [.next()][CountByGroupFetcher.next] call doesn't affect this value.
      */
-    val nullCount:  UInt
+    val nullCount: UInt
 
     /**
      * Key of a current group.
@@ -34,11 +34,11 @@ interface CountByGroupFetcher<T : Any> {
      * Returns `false` if all groups already fetched.
      * In this case, the transaction is closed and an object becomes invalid.
      */
-    /* suspend */ fun next(): Boolean
+    suspend fun next(): Boolean
 
     /**
      * If transaction not ended, closes it.
      * @throws IllegalStateException if the transaction was ended or aborted before.
      */
-    /* suspend */ fun abortFetching()
+    suspend fun abortFetching()
 }
