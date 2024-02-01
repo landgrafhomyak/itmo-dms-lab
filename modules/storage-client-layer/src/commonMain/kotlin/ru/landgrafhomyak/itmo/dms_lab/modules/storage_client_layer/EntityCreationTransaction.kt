@@ -18,12 +18,14 @@ interface EntityCreationTransaction : EntityMutator {
     suspend fun finishCreating()
 
     /**
-     * Passes a created object to storage ***if it is [less][EntityDescriptor.compare] than any object in storage***
+     * Passes a created entity to storage ***if it is [less][EntityDescriptor.compare] than any object in storage***
+     * @return `true` if object stored.
      */
-    suspend fun finishCreatingIfMin()
+    suspend fun finishCreatingIfMin(): Boolean
 
     /**
-     * Passes a created object to storage ***if it is [greater][EntityDescriptor.compare] than any object in storage***
+     * Passes a created entity to storage ***if it is [greater][EntityDescriptor.compare] than any object in storage***
+     * @return `true` if object stored.
      */
-    suspend fun finishCreatingIfMax()
+    suspend fun finishCreatingIfMax(): Boolean
 }
