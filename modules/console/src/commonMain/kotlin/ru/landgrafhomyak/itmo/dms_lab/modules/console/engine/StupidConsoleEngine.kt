@@ -2,10 +2,16 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.ConsoleInterface
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.ConsoleTextStyle
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.PrefixedConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
-import java.util.IllegalFormatCodePointException
 
-class StupidConsoleEngine(private val console: ConsoleInterface, private val commandsContext: CommandsContext) {
+class StupidConsoleEngine(
+    console: ConsoleInterface,
+    private val commandsContext: CommandsContext,
+    isInner: Boolean = false
+) {
+    private val console = if (!isInner) console else PrefixedConsoleWrapper("|", console)
+
     suspend fun mainloop() {
         while (true) {
             this.console.setStyle(ConsoleTextStyle.UTILITY)

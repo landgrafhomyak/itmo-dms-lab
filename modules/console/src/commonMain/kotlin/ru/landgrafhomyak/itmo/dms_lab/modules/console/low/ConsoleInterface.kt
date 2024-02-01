@@ -1,12 +1,6 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console.low
 
-interface ConsoleInterface {
-    @Suppress("SpellCheckingInspection")
-    fun readln():String?
+interface ConsoleInterface : InputConsoleInterface, OutputConsoleInterface {
 
-    fun print(s: String)
 
-    fun println(s: String)
-
-    fun setStyle(style: ConsoleTextStyle)
 }
