@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalContracts::class)
 
-package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer
+package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
