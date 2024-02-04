@@ -13,8 +13,7 @@ interface CommandsContext {
      * be dropped without notifying.
      */
     interface EntityCreatorForCommand : EntityMutator {
-        override operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional): CommandsContext.EntityCreatorForCommand?
-        override operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute.Required): CommandsContext.EntityCreatorForCommand
+        override operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): CommandsContext.EntityCreatorForCommand
     }
 
     /**

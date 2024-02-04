@@ -2,6 +2,7 @@
 
 package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract
 
+import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAccessor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
@@ -91,3 +92,45 @@ suspend inline fun <T : Any> StorageClientLayer.countByGroup(
         throw e1
     }
 }
+
+
+suspend inline fun StorageEntityReader.readRemainingSafe(
+    receiver: (id: UInt, attributes: EntityAccessor) -> Unit
+) {
+    contract {
+        callsInPlace(receiver)
+    }
+    try {
+        while (this.next())
+            receiver(this.id, this)
+    } catch (e1: Throwable) {
+        try {
+            this.abortFetching()
+        } catch (e2: Throwable) {
+            e1.addSuppressed(e2)
+        }
+        throw e1
+    }
+}
+
+
+suspend inline fun StorageEntityUpdater.writeRemainingSafe(
+    receiver: (attributes: EntityMutator) -> Unit
+) {
+    contract {
+        callsInPlace(receiver)
+    }
+    try {
+        while (this.next())
+            receiver(this)
+
+    } catch (e1: Throwable) {
+        try {
+            this.abortFetching()
+        } catch (e2: Throwable) {
+            e1.addSuppressed(e2)
+        }
+        throw e1
+    }
+}
+

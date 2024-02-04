@@ -20,7 +20,7 @@ interface ActionTransaction {
      *
      * After function calling this object becomes invalid to call any method on it.
      */
-    suspend fun select(vararg attributes: EntityAttributeDescriptor<*, *>): StorageEntityFetcher
+    suspend fun select(vararg attributes: EntityAttributeDescriptor<*, *>): StorageEntityReader
 
     /**
      * Returns object that allows to read and edit collected objects.

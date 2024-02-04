@@ -3,7 +3,7 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 
 /**
- * Similar to [StorageEntityFetcher], but for accessing groups.
+ * Similar to [StorageEntityReader], but for accessing groups.
  */
 interface CountByGroupFetcher<T : Any> {
     /**
