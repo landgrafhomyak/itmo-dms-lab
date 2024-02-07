@@ -2,6 +2,7 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.CommonFilterBuilderImpl
 
 /**
  * Client's interface to access storage (doesn't matter is it in memory, in file or remote)
@@ -31,10 +32,13 @@ interface StorageClientLayer {
      */
     fun startEntityCreating(): EntityCreationTransaction
 
+
+    fun startFilterCreating(): FilterBuilder = CommonFilterBuilderImpl(this.rootEntityDescriptor)
+
     /**
      * Starts universal transaction.
      */
-    fun startQuery(): FilterTransaction
+    suspend fun startActionByFilter(filter: Filter): ActionTransaction
 
     /**
      * Starts transaction for an object with specified [ordinal][id]

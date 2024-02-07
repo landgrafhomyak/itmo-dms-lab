@@ -4,7 +4,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 
 /**
  * Transaction object providing some actions for collected via
- * [FilterTransaction] or [StorageClientLayer.actionById] entities.
+ * [Filter] or [StorageClientLayer.actionById] entities.
  */
 interface ActionTransaction {
     /**
