@@ -12,9 +12,12 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
     @Suppress("ClassName")
     sealed interface _Optional<out R : Any, in W : Any>
 
+    @Suppress("ClassName")
+    sealed interface _Required<out R : Any, in W : Any>
+
     @Suppress("ClassName", "SpellCheckingInspection")
     sealed interface _Checkable<T : Any> {
-        abstract fun checkValid(value: T): Boolean
+        fun checkValid(value: T): Boolean
     }
 
     sealed class ComplexAttribute(
@@ -33,7 +36,8 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         class Required(
             name: String, targetEntity: EntityDescriptor,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 
     sealed class IntAttribute(
@@ -51,7 +55,8 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         abstract class Required(
             name: String,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.IntAttribute(name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.IntAttribute(name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 
     sealed class FloatAttribute(
@@ -69,7 +74,8 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         abstract class Required(
             name: String,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.FloatAttribute(name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.FloatAttribute(name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 
     sealed class StringAttribute(
@@ -87,7 +93,8 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         abstract class Required(
             name: String,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.StringAttribute(name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.StringAttribute(name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 
     sealed class BooleanAttribute(
@@ -104,7 +111,8 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         class Required(
             name: String,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.BooleanAttribute(name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.BooleanAttribute(name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 
     sealed class EnumAttribute<T : Enum<T>>(
@@ -126,6 +134,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         abstract class Required<T : Enum<T>>(
             name: String,
             masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.EnumAttribute<T>(name, false, masterDescriptor)
+        ) : EntityAttributeDescriptor.EnumAttribute<T>(name, false, masterDescriptor),
+            _Required<EntityAccessor, EntityMutator>
     }
 }

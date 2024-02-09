@@ -37,15 +37,20 @@ interface Filter : Iterable<Filter.Action> {
             val targetEntity: EntityAccessor
         ) : Filter.Action()
 
+        @Suppress("MemberVisibilityCanBePrivate")
         class CompareAttribute<T : Comparable<T>>(
             val direction: ComparatorDirection,
             val attribute: EntityAttributeDescriptor<T, *>,
             val value: T
         ) : Filter.Action() {
-            fun compare(entity: EntityAccessor): Int {
-                return entity[this.attribute].compareTo(this.value)
+            fun compare(entity: EntityAccessor): Int? {
+                return entity[this.attribute]?.compareTo(this.value)
             }
         }
+
+        class CompareAttributeNull(
+            val attribute: EntityAttributeDescriptor<*, *>,
+        ) : Filter.Action()
 
         @Suppress("ConvertObjectToDataObject")
         object FirstOnly : Filter.Action()

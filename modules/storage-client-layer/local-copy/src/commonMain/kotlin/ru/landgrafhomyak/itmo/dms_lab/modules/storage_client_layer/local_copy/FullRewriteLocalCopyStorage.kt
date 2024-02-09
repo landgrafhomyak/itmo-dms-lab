@@ -85,6 +85,8 @@ abstract class FullRewriteLocalCopyStorage private constructor(
             this.data[attribute] = null
         }
 
+        @Suppress("INAPPLICABLE_JVM_NAME")
+        @JvmName("setOptional")
         override fun <T : Any, A> set(attribute: A, value: T?)
                 where A : EntityAttributeDescriptor<T, *>,
                       A : EntityAttributeDescriptor._Optional<T, *> {
@@ -97,16 +99,22 @@ abstract class FullRewriteLocalCopyStorage private constructor(
             this.data[attribute] = value
         }
 
-        override fun <T : Any, A> get(attribute: A): T?
-                where A : EntityAttributeDescriptor<T, *>,
-                      A : EntityAttributeDescriptor._Optional<T, *> {
+        override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? {
+            this._assertIsMutable()
             @Suppress("UNCHECKED_CAST")
             return this.data[attribute] as T?
         }
 
-        override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T {
+        @Suppress("INAPPLICABLE_JVM_NAME")
+        @JvmName("getRequired")
+        override fun <T : Any, A> get(attribute: A): T
+                where A : EntityAttributeDescriptor<T, *>,
+                      A : EntityAttributeDescriptor._Required<T, *> {
+            this._assertIsMutable()
             @Suppress("UNCHECKED_CAST")
-            return this.data[attribute] as T
+            return this.data[attribute]
+                .let { v -> v ?: throw RuntimeException("Required attribute not set") }
+                .let { v -> v as T }
         }
     }
 
@@ -180,11 +188,14 @@ abstract class FullRewriteLocalCopyStorage private constructor(
             return this.data[attribute]
         }
 
+
         override fun <T : Any> set(attribute: EntityAttributeDescriptor<T, *>, value: T) {
             this._assertIsActive()
             this.data[attribute] = value
         }
 
+        @Suppress("INAPPLICABLE_JVM_NAME")
+        @JvmName("setOptional")
         override fun <T : Any, A> set(attribute: A, value: T?)
                 where A : EntityAttributeDescriptor<T, *>,
                       A : EntityAttributeDescriptor._Optional<T, *> {
@@ -241,22 +252,24 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                     this.currentWrapped = if (value == null) NullEntityAccessor else this.SafeAccessor(value, value)
                 }
 
+
             @Suppress("PrivatePropertyName")
             private val NullEntityAccessor = object : EntityAccessor {
                 fun `throw`(): Nothing = throw IllegalStateException("Entity not fetched yet")
                 override val descriptor: EntityDescriptor
                     get() = this.`throw`()
 
-                override fun <T : Any, A> get(attribute: A): T?
+                override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? {
+                    this.`throw`()
+                }
+
+                @Suppress("INAPPLICABLE_JVM_NAME")
+                @JvmName("getRequired")
+                override fun <T : Any, A> get(attribute: A): T
                         where A : EntityAttributeDescriptor<T, *>,
-                              A : EntityAttributeDescriptor._Optional<T, *> {
+                              A : EntityAttributeDescriptor._Required<T, *> {
                     this.`throw`()
                 }
-
-                override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T {
-                    this.`throw`()
-                }
-
             }
 
             private var currentWrapped: EntityAccessor = NullEntityAccessor
@@ -311,40 +324,44 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 override val descriptor: EntityDescriptor
                     get() = this._assertActive { this.target.descriptor }
 
-                override fun <T : Any, A> get(attribute: A): T?
+                @Suppress("INAPPLICABLE_JVM_NAME")
+                @JvmName("getRequired")
+                override fun <T : Any, A> get(attribute: A): T
                         where A : EntityAttributeDescriptor<T, *>,
-                              A : EntityAttributeDescriptor._Optional<T, *> = this._assertActive {
-                    @Suppress("UNCHECKED_CAST")
-                    if (attribute is EntityAttributeDescriptor.ComplexAttribute)
-                        return@_assertActive this.target[attribute]
-                            ?.let { e -> this@SelectorImpl.SafeAccessor(this.key, e as EntityAccessor) } as T?
-                    else
-                        return@_assertActive this.target[attribute]
-                }
+                              A : EntityAttributeDescriptor._Required<T, *> = this._assertActive {
 
-                override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T = this._assertActive {
                     @Suppress("UNCHECKED_CAST")
-                    if (attribute is EntityAttributeDescriptor.ComplexAttribute)
+                    if (attribute is EntityAttributeDescriptor.ComplexAttribute.Required)
                         return@_assertActive this.target[attribute]
                             .let { e -> this@SelectorImpl.SafeAccessor(this.key, e) } as T
                     else
                         return@_assertActive this.target[attribute]
                 }
 
+                override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? = this._assertActive {
+                    @Suppress("UNCHECKED_CAST")
+                    if (attribute is EntityAttributeDescriptor.ComplexAttribute)
+                        return@_assertActive this.target[attribute]
+                            ?.let { e -> this@SelectorImpl.SafeAccessor(this.key, e) } as T?
+                    else
+                        return@_assertActive this.target[attribute]
+                }
+
             }
 
-            override fun <T : Any, A> get(attribute: A): T?
+            @Suppress("INAPPLICABLE_JVM_NAME")
+            @JvmName("getRequired")
+            override fun <T : Any, A> get(attribute: A): T
                     where A : EntityAttributeDescriptor<T, *>,
-                          A : EntityAttributeDescriptor._Optional<T, *> {
+                          A : EntityAttributeDescriptor._Required<T, *> {
                 this._assertActive()
                 return this.currentWrapped[attribute]
             }
 
-            override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T {
+            override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? {
                 this._assertActive()
                 return this.currentWrapped[attribute]
             }
-
         }
 
         override suspend fun select(vararg attributes: EntityAttributeDescriptor<*, *>): StorageEntityReader {
@@ -355,7 +372,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
 
         private inner class UpdaterImpl : StorageEntityUpdater {
             private var isActive = false
-            private val newEntities = this@ActionTransactionImpl.collected.mapValues { (k, v) ->
+            private val newEntities = this@ActionTransactionImpl.collected.mapValues { (_, v) ->
                 val e = EntityMapImpl(this@FullRewriteLocalCopyStorage.rootEntityDescriptor)
                 v.copyInto(e)
                 return@mapValues e
@@ -399,6 +416,8 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                     }
 
 
+                @Suppress("INAPPLICABLE_JVM_NAME")
+                @JvmName("setOptional")
                 override fun <T : Any, A> set(attribute: A, value: T?): Unit
                         where A : EntityAttributeDescriptor<T, *>,
                               A : EntityAttributeDescriptor._Optional<T, *> =
@@ -443,6 +462,8 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 }
             }
 
+            @Suppress("INAPPLICABLE_JVM_NAME")
+            @JvmName("setOptional")
             override fun <T : Any, A> set(attribute: A, value: T?)
                     where A : EntityAttributeDescriptor<T, *>,
                           A : EntityAttributeDescriptor._Optional<T, *> = this._assertActive {
@@ -514,12 +535,18 @@ abstract class FullRewriteLocalCopyStorage private constructor(
 
                     is Filter.Action.CompareAttribute<*> ->
                         collected = (collected ?: this._formatIndex2EntityMap()).filterValues { v ->
+                            val compilationResult = constraint.compare(v) ?: return@filterValues false
                             when (constraint.direction) {
-                                Filter.Action.ComparatorDirection.LOWER -> constraint.compare(v) < 0
-                                Filter.Action.ComparatorDirection.EQUAL -> constraint.compare(v) == 0
-                                Filter.Action.ComparatorDirection.GREATER -> constraint.compare(v) > 0
+                                Filter.Action.ComparatorDirection.LOWER -> compilationResult < 0
+                                Filter.Action.ComparatorDirection.EQUAL -> compilationResult == 0
+                                Filter.Action.ComparatorDirection.GREATER -> compilationResult > 0
                             }
                         }
+
+                    is Filter.Action.CompareAttributeNull -> {
+                        collected = (collected ?: this._formatIndex2EntityMap())
+                            .filterValues { v -> v[constraint.attribute] == null }
+                    }
 
                     is Filter.Action.CompareEntity ->
                         collected = (collected ?: this._formatIndex2EntityMap()).filterValues { v ->
@@ -541,7 +568,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
             this.globalMutex.unlock(mutexOwner)
             throw e
         }
-        }
+    }
 
     private inner class GroupCounterImpl<T : Any>(
         private val mutexOwner: Any,
@@ -614,13 +641,30 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         val groups = HashMap<T, UInt>()
         this.globalMutex.lock(mutexOwner)
         try {
-            this.changes.forEach { e ->
-                val v = e[attr]
-                if (v == null)
-                    nullsCount++
-                else
-                    groups[v] = groups.getOrElse(v) { 0u } + 1u
+            when (attr) {
+                is EntityAttributeDescriptor._Optional<*, *> -> {
+                    @Suppress("UNCHECKED_CAST")
+                    attr as EntityAttributeDescriptor._Optional<T, *>
+                    this.changes.forEach { e ->
+                        val v: T? = e[attr]
+                        if (v == null)
+                            nullsCount++
+                        else
+                            groups[v] = groups.getOrElse(v) { 0u } + 1u
+                    }
+                }
+
+                is EntityAttributeDescriptor._Required<*, *> -> {
+                    @Suppress("UNCHECKED_CAST")
+                    this.changes.forEach { e ->
+                        val v: T = e[attr] as T
+                        groups[v] = groups.getOrElse(v) { 0u } + 1u
+                    }
+                }
+
+                else -> throw IllegalArgumentException("Unknown attribute type")
             }
+
             return this.GroupCounterImpl(mutexOwner, attr, nullsCount, groups.entries.iterator())
         } catch (e: Throwable) {
             this.globalMutex.unlock(mutexOwner)

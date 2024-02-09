@@ -122,7 +122,7 @@ class StupidConsoleEngine(
                     }
                 }
 
-                is EntityAttributeDescriptor.BooleanAttribute -> when (a.toLowerCase()) {
+                is EntityAttributeDescriptor.BooleanAttribute -> @Suppress("DEPRECATION") when (a.toLowerCase()) {
                     "" -> if (d is EntityAttributeDescriptor.BooleanAttribute.Optional)
                         entity[d] = null
 

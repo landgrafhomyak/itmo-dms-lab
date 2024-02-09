@@ -5,15 +5,16 @@ class EntityMapImpl(
     private val data: MutableMap<EntityAttributeDescriptor<*, *>, Any?> = HashMap()
 ) : EntityAccessor, EntityMutator {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any, A> get(attribute: A): T?
-            where A : EntityAttributeDescriptor<T, *>,
-                  A : EntityAttributeDescriptor._Optional<T, *> {
+    override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? {
         this.descriptor.assertAttribute(attribute)
         return this.data[attribute] as T?
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T {
+    @Suppress("UNCHECKED_CAST", "INAPPLICABLE_JVM_NAME")
+    @JvmName("getRequired")
+    override fun <T : Any, A> get(attribute: A): T
+            where A : EntityAttributeDescriptor<T, *>,
+                  A : EntityAttributeDescriptor._Required<T, *> {
         this.descriptor.assertAttribute(attribute)
         return this.data[attribute]
             .let { v -> v ?: throw RuntimeException("Important attribute not set") }
@@ -32,6 +33,8 @@ class EntityMapImpl(
         this.data[attribute] = null
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("setOptional")
     override fun <T : Any, A> set(attribute: A, value: T?)
             where A : EntityAttributeDescriptor<T, *>,
                   A : EntityAttributeDescriptor._Optional<T, *> {

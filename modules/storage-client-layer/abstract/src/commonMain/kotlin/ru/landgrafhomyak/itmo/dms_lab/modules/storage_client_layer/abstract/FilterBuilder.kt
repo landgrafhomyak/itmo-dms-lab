@@ -22,7 +22,7 @@ interface FilterBuilder {
     /**
      * Selects only entities whose [attribute][attr] equals to [specified value][value].
      */
-    fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T): FilterBuilder
+    fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T?): FilterBuilder
 
     /**
      * Selects only entities whose [attribute][attr] greater than [specified value][value].

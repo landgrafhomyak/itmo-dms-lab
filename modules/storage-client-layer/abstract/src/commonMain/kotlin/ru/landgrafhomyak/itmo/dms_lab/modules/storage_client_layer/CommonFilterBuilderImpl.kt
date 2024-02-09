@@ -27,14 +27,20 @@ class CommonFilterBuilderImpl(
         return this
     }
 
-    override fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T): FilterBuilder {
-        this.collectedActions.add(
-            Filter.Action.CompareAttribute(
-                Filter.Action.ComparatorDirection.EQUAL,
-                attr,
-                value
+    override fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T?): FilterBuilder {
+        if (value == null) {
+            this.collectedActions.add(
+                Filter.Action.CompareAttributeNull(attr)
             )
-        )
+        } else {
+            this.collectedActions.add(
+                Filter.Action.CompareAttribute(
+                    Filter.Action.ComparatorDirection.EQUAL,
+                    attr,
+                    value
+                )
+            )
+        }
         return this
     }
 
