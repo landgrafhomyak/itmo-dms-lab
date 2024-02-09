@@ -41,11 +41,6 @@ interface StorageClientLayer {
     suspend fun startActionByFilter(filter: Filter): ActionTransaction
 
     /**
-     * Starts transaction for an object with specified [ordinal][id]
-     */
-    suspend fun startActionById(id: UInt): ActionTransaction?
-
-    /**
      * Groups entities by [specified attribute][attr] and returns quantity of entities in each group.
      */
     suspend fun <T : Any> countByGroup(attr: EntityAttributeDescriptor<T, *>): CountByGroupFetcher<T>

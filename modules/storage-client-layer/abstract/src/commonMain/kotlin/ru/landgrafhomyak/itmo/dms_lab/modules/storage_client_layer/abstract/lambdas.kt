@@ -95,27 +95,7 @@ suspend inline fun <T : Any> StorageClientLayer.countByGroup(
 
 
 suspend inline fun StorageEntityReader.readRemainingSafe(
-    receiver: (id: UInt, attributes: EntityAccessor) -> Unit
-) {
-    contract {
-        callsInPlace(receiver)
-    }
-    try {
-        while (this.next())
-            receiver(this.id, this)
-    } catch (e1: Throwable) {
-        try {
-            this.abortFetching()
-        } catch (e2: Throwable) {
-            e1.addSuppressed(e2)
-        }
-        throw e1
-    }
-}
-
-
-suspend inline fun StorageEntityUpdater.writeRemainingSafe(
-    receiver: (attributes: EntityMutator) -> Unit
+    receiver: (attributes: EntityAccessor) -> Unit
 ) {
     contract {
         callsInPlace(receiver)
@@ -123,7 +103,6 @@ suspend inline fun StorageEntityUpdater.writeRemainingSafe(
     try {
         while (this.next())
             receiver(this)
-
     } catch (e1: Throwable) {
         try {
             this.abortFetching()
@@ -134,3 +113,33 @@ suspend inline fun StorageEntityUpdater.writeRemainingSafe(
     }
 }
 
+suspend fun StorageClientLayer.deleteByFilter(filter: Filter) {
+    this.startActionByFilter(filter).delete()
+}
+
+suspend fun StorageClientLayer.countByFilter(filter: Filter): UInt {
+    return this.startActionByFilter(filter).count()
+}
+
+suspend inline fun StorageClientLayer.readByFilter(
+    filter: Filter,
+    vararg attributes: EntityAttributeDescriptor<*, *>,
+    receiver: (attributes: EntityAccessor) -> Unit
+) {
+    this.startActionByFilter(filter).select(*attributes).readRemainingSafe(receiver)
+}
+
+
+suspend inline fun StorageClientLayer.updateByFilter(
+    filter: Filter,
+    receiver: (attributes: EntityMutator) -> Unit
+) {
+    val transaction = this.startActionByFilter(filter).update()
+    try {
+        receiver(transaction)
+        transaction.performUpdate()
+    } catch (e: Throwable) {
+        transaction.abort()
+        throw e
+    }
+}

@@ -6,9 +6,6 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAccessor
  * Similar to Java's `ResultRow`. Provides access to [collected][ActionTransaction.select] entities.
  */
 interface StorageEntityReader : EntityAccessor {
-
-    val id: UInt
-
     /**
      * Fetches next entity.
      *
