@@ -23,22 +23,9 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
     sealed class ComplexAttribute(
         val targetEntity: EntityDescriptor,
         name: String,
-        isNullable: Boolean,
         masterDescriptor: EntityDescriptor
-    ) : EntityAttributeDescriptor<EntityAccessor, EntityMutator>(name, isNullable, masterDescriptor) {
-        class Optional(
-            name: String,
-            targetEntity: EntityDescriptor,
-            masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, true, masterDescriptor),
-            _Optional<EntityAccessor, EntityMutator>
-
-        class Required(
-            name: String, targetEntity: EntityDescriptor,
-            masterDescriptor: EntityDescriptor
-        ) : EntityAttributeDescriptor.ComplexAttribute(targetEntity, name, false, masterDescriptor),
-            _Required<EntityAccessor, EntityMutator>
-    }
+    ) : EntityAttributeDescriptor<EntityAccessor, EntityMutator>(name, false, masterDescriptor),
+        _Required<EntityAccessor, EntityMutator>
 
     sealed class IntAttribute(
         name: String,

@@ -159,12 +159,7 @@ class StupidConsoleEngine(
         }
 
         for (d in complex) {
-            val recEntity: CommandsContext.EntityCreatorForCommand
-            @Suppress("LiftReturnOrAssignment")
-            when (d) {
-                is EntityAttributeDescriptor.ComplexAttribute.Required -> recEntity = entity[d]
-                is EntityAttributeDescriptor.ComplexAttribute.Optional -> recEntity = entity[d] ?: continue
-            }
+            val recEntity = entity[d]
             this.console.setStyle(ConsoleTextStyle.UTILITY)
             this.console.print("${">".repeat(depth.toInt())} {${d.targetEntity.name}} ")
             this.console.setStyle(ConsoleTextStyle.HIGHLIGHT)

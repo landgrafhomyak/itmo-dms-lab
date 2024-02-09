@@ -5,7 +5,6 @@ import kotlin.jvm.JvmName
 interface EntityMutator {
     val descriptor: EntityDescriptor
     operator fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): EntityMutator
-    operator fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?)
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("setOptional")

@@ -28,11 +28,6 @@ class EntityMapImpl(
             .let { v -> (v as? EntityMutator) ?: throw RuntimeException("Entity stored value with wrong type") }
     }
 
-    override fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?) {
-        this.descriptor.assertAttribute(attribute)
-        this.data[attribute] = null
-    }
-
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("setOptional")
     override fun <T : Any, A> set(attribute: A, value: T?)

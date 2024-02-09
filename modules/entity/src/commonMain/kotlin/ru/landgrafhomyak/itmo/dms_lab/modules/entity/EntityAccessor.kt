@@ -17,15 +17,8 @@ interface EntityAccessor {
         for (attr in this.descriptor) {
             @Suppress("REDUNDANT_ELSE_IN_WHEN")
             when (attr) {
-                is EntityAttributeDescriptor.ComplexAttribute.Optional -> {
-                    val v = this[attr]
-                    if (v == null)
-                        dst[attr] = null
-                    else
-                        v.copyInto(dst[attr])
-                }
 
-                is EntityAttributeDescriptor.ComplexAttribute.Required -> {
+                is EntityAttributeDescriptor.ComplexAttribute -> {
                     this[attr].copyInto(dst[attr])
                 }
 

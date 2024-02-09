@@ -51,11 +51,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 for (attr in this@FullRewriteLocalCopyStorage.rootEntityDescriptor) {
                     if (attr !is EntityAttributeDescriptor.ComplexAttribute)
                         continue
-                    if (attr is EntityAttributeDescriptor.ComplexAttribute.Optional) {
-                        @Suppress("USELESS_CAST") // getter for complex attribute conflicts with mutator
-                        if ((this as EntityAccessor)[attr] == null)
-                            continue
-                    }
                     @Suppress("USELESS_CAST")
                     (this as EntityMutator)[attr]
                         .let { c -> c as? LocalEntity ?: throw RuntimeException("Wrong attribute value") }
@@ -78,11 +73,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): EntityMutator {
             this._assertIsMutable()
             return this.data[attribute] as? EntityMutator ?: throw RuntimeException("Wrong attribute value")
-        }
-
-        override fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?) {
-            this._assertIsMutable()
-            this.data[attribute] = null
         }
 
         @Suppress("INAPPLICABLE_JVM_NAME")
@@ -199,11 +189,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         override fun <T : Any, A> set(attribute: A, value: T?)
                 where A : EntityAttributeDescriptor<T, *>,
                       A : EntityAttributeDescriptor._Optional<T, *> {
-            this._assertIsActive()
-            this.data[attribute] = value
-        }
-
-        override fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?) {
             this._assertIsActive()
             this.data[attribute] = value
         }
@@ -331,7 +316,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                               A : EntityAttributeDescriptor._Required<T, *> = this._assertActive {
 
                     @Suppress("UNCHECKED_CAST")
-                    if (attribute is EntityAttributeDescriptor.ComplexAttribute.Required)
+                    if (attribute is EntityAttributeDescriptor.ComplexAttribute)
                         return@_assertActive this.target[attribute]
                             .let { e -> this@SelectorImpl.SafeAccessor(this.key, e) } as T
                     else
@@ -342,7 +327,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                     @Suppress("UNCHECKED_CAST")
                     if (attribute is EntityAttributeDescriptor.ComplexAttribute)
                         return@_assertActive this.target[attribute]
-                            ?.let { e -> this@SelectorImpl.SafeAccessor(this.key, e) } as T?
+                            .let { e -> this@SelectorImpl.SafeAccessor(this.key, e) } as T?
                     else
                         return@_assertActive this.target[attribute]
                 }
@@ -385,17 +370,11 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 @Suppress("FunctionName")
                 private fun _getMutator(root: EntityMutator): EntityMutator? {
                     @Suppress("LiftReturnOrAssignment")
-                    if (this.attribute is EntityAttributeDescriptor.ComplexAttribute.Optional) {
-                        if (this.parent == null)
-                            return root[this.attribute]
-                        else
-                            return this.parent._getMutator(root)?.get(this.attribute)
-                    } else {
-                        if (this.parent == null)
-                            return root[this.attribute]
-                        else
-                            return this.parent._getMutator(root)?.get(this.attribute)
-                    }
+
+                    if (this.parent == null)
+                        return root[this.attribute]
+                    else
+                        return this.parent._getMutator(root)?.get(this.attribute)
                 }
 
                 override val descriptor: EntityDescriptor
@@ -406,13 +385,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): EntityMutator =
                     this@UpdaterImpl._assertActive {
                         this._cache.getOrPut(attribute) { RecursiveUpdater(this, attribute) }
-                    }
-
-                override fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?): Unit =
-                    this@UpdaterImpl._assertActive {
-                        this@UpdaterImpl.newEntities.values.onEach { e ->
-                            this._getMutator(e)?.set(attribute, null)
-                        }
                     }
 
 
@@ -455,12 +427,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
 
             override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): EntityMutator =
                 this._assertActive { this.cache.getOrPut(attribute) { RecursiveUpdater(null, attribute) } }
-
-            override fun set(attribute: EntityAttributeDescriptor.ComplexAttribute.Optional, value: Nothing?) = this._assertActive {
-                this.newEntities.values.forEach { e ->
-                    e[attribute] = null
-                }
-            }
 
             @Suppress("INAPPLICABLE_JVM_NAME")
             @JvmName("setOptional")
