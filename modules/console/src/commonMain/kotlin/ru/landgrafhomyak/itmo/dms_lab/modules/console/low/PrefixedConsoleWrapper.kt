@@ -7,7 +7,7 @@ class PrefixedConsoleWrapper(
     private var isNewLine = true
     private val prefixLn = "\n" + this.prefix
 
-    override fun print(s: String) {
+    override suspend fun print(s: String) {
         @Suppress("RemoveRedundantQualifierName")
         val ss = PrefixedConsoleWrapper.newLinePattern.replace(s, this.prefixLn)
         if (this.isNewLine) {
@@ -18,7 +18,7 @@ class PrefixedConsoleWrapper(
         }
     }
 
-    override fun println(s: String) {
+    override suspend fun println(s: String) {
         @Suppress("RemoveRedundantQualifierName")
         val ss = PrefixedConsoleWrapper.newLinePattern.replace(s, this.prefixLn)
         if (this.isNewLine) {

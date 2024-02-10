@@ -42,7 +42,7 @@ class StupidConsoleEngine(
         }
     }
 
-    private fun fillEntity(entity: CommandsContext.EntityCreatorForCommand, args: List<String>, depth: UInt = 1u): Boolean {
+    private suspend fun fillEntity(entity: CommandsContext.EntityCreatorForCommand, args: List<String>, depth: UInt = 1u): Boolean {
         val primitive = ArrayList<EntityAttributeDescriptor<*, *>>()
         val complex = ArrayList<EntityAttributeDescriptor.ComplexAttribute>()
         for (attr in entity.descriptor) {
@@ -183,7 +183,7 @@ class StupidConsoleEngine(
     }
 
     @Suppress("LiftReturnOrAssignment")
-    private inline fun <T : Any> catchIAE(attrName: String, block: () -> T): T? {
+    private suspend inline fun <T : Any> catchIAE(attrName: String, block: () -> T): T? {
         try {
             return block()
         } catch (e: IllegalArgumentException) {

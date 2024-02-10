@@ -1,9 +1,9 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console.low
 
 interface OutputConsoleInterface {
-    fun print(s: String)
+    suspend fun print(s: String)
 
-    fun println(s: String)
+    suspend fun println(s: String)
 
-    fun setStyle(style: ConsoleTextStyle)
+    suspend fun setStyle(style: ConsoleTextStyle)
 }

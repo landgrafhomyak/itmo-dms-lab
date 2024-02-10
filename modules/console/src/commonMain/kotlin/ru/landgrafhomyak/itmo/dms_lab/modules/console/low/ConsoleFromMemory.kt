@@ -12,7 +12,7 @@ class ConsoleFromMemory(
         vararg inputs: String
     ) : this(inputs.iterator())
 
-    override fun readln(): String? =
+    override suspend fun readln(): String? =
         if (!this.inputs.hasNext()) null
         else this.inputs.next()
 
