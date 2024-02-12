@@ -5,5 +5,5 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Stor
 interface Action {
     val name: String
     val description: String
-    suspend fun executeIO(set: ActionsSet, storage: StorageClientLayer, io: ActionIOProvider)
+    suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment)
 }

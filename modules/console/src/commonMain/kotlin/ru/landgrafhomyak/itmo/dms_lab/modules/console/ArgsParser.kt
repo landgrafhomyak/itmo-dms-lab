@@ -1,6 +1,6 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console
 
-internal class ArgsParser(private val data: String) : Iterator<String> {
+class ArgsParser(private val data: String) : Iterator<String> {
     private var pos = 0
     private var next: String? = null
     private fun parseNext() {
