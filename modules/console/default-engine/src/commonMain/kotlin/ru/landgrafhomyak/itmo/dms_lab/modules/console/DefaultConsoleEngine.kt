@@ -26,7 +26,7 @@ class DefaultConsoleEngine(
             this.console.setStyle(ConsoleTextStyle.INPUT)
             val rawCommand = this.console.readln()
             this.console.setStyle(ConsoleTextStyle.DEFAULT)
-            if (rawCommand === null) {
+            if (rawCommand == null) {
                 this.console.setStyle(ConsoleTextStyle.UTILITY)
                 this.console.println("\nInput stream ended, exiting")
                 this.console.setStyle(ConsoleTextStyle.DEFAULT)

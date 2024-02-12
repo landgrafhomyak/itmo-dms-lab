@@ -9,6 +9,7 @@ kotlin {
         jvmToolchain(8)
         withJava()
     }
+    js()
     sourceSets {
         val commonMain by getting {
             dependencies {
