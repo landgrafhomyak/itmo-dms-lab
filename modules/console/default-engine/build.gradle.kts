@@ -13,7 +13,7 @@ kotlin {
                 implementation(project(":modules:entity"))
                 implementation(project(":modules:console"))
                 implementation(project(":modules:action"))
-                implementation(project(":modules:storage-client-layer:abstract"))
+                implementation(project(":modules:storage-client-layer"))
             }
         }
         val commonTest by getting {

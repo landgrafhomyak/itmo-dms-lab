@@ -14,7 +14,7 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
                 implementation(project(":modules:entity"))
-                implementation(project(":modules:storage-client-layer:abstract"))
+                implementation(project(":modules:storage-client-layer"))
 
             }
         }
