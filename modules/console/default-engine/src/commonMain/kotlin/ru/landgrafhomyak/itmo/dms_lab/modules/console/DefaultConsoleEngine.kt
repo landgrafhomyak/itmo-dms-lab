@@ -3,7 +3,7 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
 import ru.landgrafhomyak.itmo.dms_lab.modules.action.ActionIoProvider
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.PrefixedConsoleWrapper
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.PrefixedConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
 import ru.landgrafhomyak.itmo.dms_lab.modules.action.Environment

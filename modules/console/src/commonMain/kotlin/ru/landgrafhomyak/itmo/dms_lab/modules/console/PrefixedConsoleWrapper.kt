@@ -1,4 +1,6 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract
+package ru.landgrafhomyak.itmo.dms_lab.modules.console
+
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
 
 class PrefixedConsoleWrapper(
     private val prefix: String,

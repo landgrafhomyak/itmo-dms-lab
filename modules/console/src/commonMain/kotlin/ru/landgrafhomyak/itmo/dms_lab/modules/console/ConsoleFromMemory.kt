@@ -1,4 +1,7 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract
+package ru.landgrafhomyak.itmo.dms_lab.modules.console
+
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.InputConsoleInterface
 
 class ConsoleFromMemory(
     private val inputs: Iterator<String>,
