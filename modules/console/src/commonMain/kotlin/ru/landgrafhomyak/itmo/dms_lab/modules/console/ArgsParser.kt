@@ -1,5 +1,7 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console
 
+import kotlin.jvm.JvmStatic
+
 class ArgsParser(private val data: String) : Iterator<String> {
     private var pos = 0
     private var next: String? = null
