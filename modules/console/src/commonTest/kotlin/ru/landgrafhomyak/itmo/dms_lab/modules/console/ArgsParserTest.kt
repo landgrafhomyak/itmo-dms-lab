@@ -1,5 +1,6 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
+package ru.landgrafhomyak.itmo.dms_lab.modules.console
 
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.ArgsParser
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 

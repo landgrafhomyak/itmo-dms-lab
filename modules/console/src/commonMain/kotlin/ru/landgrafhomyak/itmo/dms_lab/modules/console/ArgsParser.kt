@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
+package ru.landgrafhomyak.itmo.dms_lab.modules.console
 
 internal class ArgsParser(private val data: String) : Iterator<String> {
     private var pos = 0

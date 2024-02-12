@@ -1,11 +1,11 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
 
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.ConsoleInterface
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.ConsoleTextStyle
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.low.PrefixedConsoleWrapper
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.PrefixedConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 
-class StupidConsoleEngine(
+class DefaultConsoleEngine(
     console: ConsoleInterface,
     private val commandsContext: CommandsContext,
     isInner: Boolean = false

@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.low
+package ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract
 
 interface OutputConsoleInterface {
     suspend fun print(s: String)
