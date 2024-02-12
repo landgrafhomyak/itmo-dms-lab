@@ -9,6 +9,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
 import ru.landgrafhomyak.itmo.dms_lab.modules.action.Environment
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.ArgsParser
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 
 
 class DefaultConsoleEngine(
@@ -25,7 +26,7 @@ class DefaultConsoleEngine(
             this.console.setStyle(ConsoleTextStyle.INPUT)
             val rawCommand = this.console.readln()
             this.console.setStyle(ConsoleTextStyle.DEFAULT)
-            if (rawCommand == null) {
+            if (rawCommand === null) {
                 this.console.setStyle(ConsoleTextStyle.UTILITY)
                 this.console.println("\nInput stream ended, exiting")
                 this.console.setStyle(ConsoleTextStyle.DEFAULT)
@@ -34,7 +35,7 @@ class DefaultConsoleEngine(
             val (extractedRawCommand, firstLine) = rawCommand
                 .trimStart()
                 .split(this.spaceRegexp, 2)
-                .let { l -> l.first to l.getOrNull(1) }
+                .let { l -> l.first() to l.getOrNull(1) }
             val command = this.environment.actionsSet.dispatchCommand(extractedRawCommand)
             if (command == null) {
                 this.console.setStyle(ConsoleTextStyle.ERROR)
@@ -43,9 +44,23 @@ class DefaultConsoleEngine(
                 continue
             }
             val io = this.ActionIoProviderImpl(firstLine)
-            command.executeIO(this.storage, io, this.environment)
-            io.isWritable = false
-            io.isReadable = false
+
+            try {
+                command.executeIO(this.storage, io, this.environment)
+            } catch (_: StopConsoleInteraction) {
+                this.console.setStyle(ConsoleTextStyle.UTILITY)
+                this.console.println("Console stopped by action")
+                this.console.setStyle(ConsoleTextStyle.DEFAULT)
+                break
+            } catch (t: Throwable) {
+                this.console.setStyle(ConsoleTextStyle.UTILITY)
+                this.console.println("Uncaught error wile running action")
+                this.console.setStyle(ConsoleTextStyle.ERROR)
+                this.console.println(t.stackTraceToString())
+            } finally {
+                io.isWritable = false
+                io.isReadable = false
+            }
         }
     }
 
@@ -103,7 +118,7 @@ class DefaultConsoleEngine(
             this@DefaultConsoleEngine.innerConsole.setStyle(style)
         }
 
-        override suspend fun fillEntity(mutator: EntityMutator):Boolean {
+        override suspend fun fillEntity(mutator: EntityMutator): Boolean {
             this._assertIsReadable()
             this.isReadable = false
             if (this.firstLine != null) {
