@@ -19,6 +19,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Stor
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.jvm.JvmName
 
 abstract class FullRewriteLocalCopyStorage private constructor(
     override val rootEntityDescriptor: EntityDescriptor,
@@ -109,7 +110,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         }
     }
 
-    override fun rollback() {
+    override suspend fun rollback() {
         this.changes.clear()
         for (o in this.changes) {
             val cp = LocalEntity(true)
@@ -119,7 +120,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         }
     }
 
-    override fun clear() {
+    override suspend fun clear() {
         this.changes.clear()
     }
 

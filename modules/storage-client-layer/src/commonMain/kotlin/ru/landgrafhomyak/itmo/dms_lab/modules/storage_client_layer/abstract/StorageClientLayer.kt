@@ -23,9 +23,11 @@ interface StorageClientLayer {
     /**
      * Discards all changes since previous commit or rollback.
      */
-    fun rollback()
+    suspend fun rollback()
 
-    fun clear()
+    suspend fun clear() {
+        this.startActionByFilter(this.startFilterCreating().all().build()).delete()
+    }
 
     /**
      * Starts transaction for creating entity.
