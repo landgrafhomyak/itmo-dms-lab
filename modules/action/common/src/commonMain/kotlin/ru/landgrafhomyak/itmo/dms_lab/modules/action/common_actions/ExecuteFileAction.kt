@@ -18,7 +18,7 @@ object ExecuteFileAction : Action {
 
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
         val path = io.readln()
-        io.finishArgsReading()
+        if (io.finishArgsReading()) return
         if (path == null) {
             io.setStyle(ConsoleTextStyle.ERROR)
             io.println("Path to file not set")

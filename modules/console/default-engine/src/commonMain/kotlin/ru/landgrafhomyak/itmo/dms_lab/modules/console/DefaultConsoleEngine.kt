@@ -43,6 +43,7 @@ class DefaultConsoleEngine(
                 this.console.setStyle(ConsoleTextStyle.DEFAULT)
                 continue
             }
+            this.environment.addActionToHistory(command)
             val io = this.ActionIoProviderImpl(firstLine)
 
             try {

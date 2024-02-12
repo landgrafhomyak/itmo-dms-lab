@@ -11,6 +11,7 @@ abstract class AbstractAddEntityAction : Action {
     @Suppress("FunctionName")
     protected abstract suspend fun _finishTransaction(transaction: EntityCreationTransaction)
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
+        if (io.finishArgsReading()) return
         val transaction = storage.startEntityCreating()
         try {
             io.fillEntity(transaction)

@@ -8,18 +8,17 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
-object ExitAction : Action {
+object ReverseAction : Action {
     override val name: String
-        get() = "exit"
+        get() = "reorder"
     override val description: String
-        get() = "Stops actions parsing and rolls back all changes in storage"
+        get() = "Reverses entities order in storage"
 
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
         if (io.finishArgsReading()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
-        io.println("Rolling back changes...")
-        storage.rollback()
-        io.println("Stopping console...")
-        throw StopConsoleInteraction()
+        io.println("Reversing...")
+        storage.reverseInline()
+        io.println("Reversed!")
     }
 }

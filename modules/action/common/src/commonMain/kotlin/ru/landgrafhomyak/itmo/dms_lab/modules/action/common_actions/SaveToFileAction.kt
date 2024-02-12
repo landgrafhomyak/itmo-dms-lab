@@ -15,6 +15,7 @@ class SaveToFileAction(private val filename: String? = null) : Action {
         get() = "Saves all changes to file (from which it was loaded)"
 
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
+        if (io.finishArgsReading()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         if (this.filename == null)
             io.println("Saving storage...")

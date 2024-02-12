@@ -8,18 +8,17 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
-object ExitAction : Action {
+object HistoryAction : Action {
     override val name: String
-        get() = "exit"
+        get() = "save"
     override val description: String
-        get() = "Stops actions parsing and rolls back all changes in storage"
+        get() = "Saves all changes to file (from which it was loaded)"
 
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
         if (io.finishArgsReading()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
-        io.println("Rolling back changes...")
-        storage.rollback()
-        io.println("Stopping console...")
-        throw StopConsoleInteraction()
+        for (a in environment.actionsHistory) {
+            io.println(a.name)
+        }
     }
 }

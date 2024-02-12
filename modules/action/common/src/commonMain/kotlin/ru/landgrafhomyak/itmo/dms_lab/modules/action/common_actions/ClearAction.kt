@@ -15,6 +15,7 @@ object ClearAction : Action {
         get() = "Removes all entities from storage"
 
     override suspend fun executeIO(storage: StorageClientLayer, io: ActionIoProvider, environment: Environment) {
+        if (io.finishArgsReading()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println("Clearing storage...")
         storage.clear()
