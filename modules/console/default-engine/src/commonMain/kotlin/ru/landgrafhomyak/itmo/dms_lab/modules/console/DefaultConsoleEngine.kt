@@ -66,7 +66,7 @@ class DefaultConsoleEngine(
     }
 
     private inner class ConsoleCommandIoProviderImpl(
-        private var firstLine: String?
+        override var argsOrNull: String?
     ) : ConsoleCommandIoProvider {
         var isReadable = true
         var isWritable = true
@@ -81,25 +81,8 @@ class DefaultConsoleEngine(
             if (!this.isReadable) throw IllegalStateException()
         }
 
-        override suspend fun finishArgsReading(): Boolean {
-            this._assertIsReadable()
-            this.isReadable = false
-            if (this.firstLine != null) {
-                this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
-                this@DefaultConsoleEngine.innerConsole.println("This action doesn't has arguments")
-                this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
-                return true
-            }
-            return false
-        }
-
         override suspend fun readln(): String? {
             this._assertIsReadable()
-            val fL = this.firstLine
-            if (fL != null) {
-                this.firstLine = null
-                return this.firstLine
-            }
             return this@DefaultConsoleEngine.innerConsole.readln()
         }
 
@@ -119,22 +102,32 @@ class DefaultConsoleEngine(
             this@DefaultConsoleEngine.innerConsole.setStyle(style)
         }
 
-        override suspend fun fillEntity(mutator: EntityMutator): Boolean {
+        override suspend fun fillEntity(firstLine: String?, target: EntityMutator): Boolean {
             this._assertIsReadable()
-            this.isReadable = false
-            if (this.firstLine != null) {
-                this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
-                this@DefaultConsoleEngine.innerConsole.println("This command doesn't has simple arguments")
-                this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
+            val rawArgs: String?
+            if (firstLine != null) {
+                rawArgs = firstLine
+            } else {
+                rawArgs = this.readln()
+                if (rawArgs == null) {
+                    this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
+                    this@DefaultConsoleEngine.innerConsole.println("This action doesn't has arguments")
+                    this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
+                    return true
+                }
             }
-            val rawArgs = this.readln()
-            if (rawArgs == null) {
+
+            return this._fillEntity(target, ArgsParser.parseToList(rawArgs))
+        }
+
+        override suspend fun assertNoArgs(): Boolean {
+            if (this.argsOrNull != null) {
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
-                this@DefaultConsoleEngine.innerConsole.println("\nInput stream ended but not all attributes are read, entity creating aborted, exiting")
+                this@DefaultConsoleEngine.innerConsole.println("This command doesn't has arguments")
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
-                return false
+                return true
             }
-            return this._fillEntity(mutator, ArgsParser.parseToList(rawArgs))
+            return false
         }
 
         @Suppress("FunctionName")

@@ -13,7 +13,7 @@ object HistoryCommand : ConsoleCommand {
         get() = "Saves all changes to file (from which it was loaded)"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         for (a in environment.commandHistory) {
             io.println(a.name)

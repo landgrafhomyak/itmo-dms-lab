@@ -16,8 +16,7 @@ object ExecuteFileCommand : ConsoleCommand {
         get() = "Executes file as script"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        val path = io.readln()
-        if (io.finishArgsReading()) return
+        val path = io.argsOrNull
         if (path == null) {
             io.setStyle(ConsoleTextStyle.ERROR)
             io.println("Path to file not set")

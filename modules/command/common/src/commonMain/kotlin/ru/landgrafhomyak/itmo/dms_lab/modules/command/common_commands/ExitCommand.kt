@@ -14,7 +14,7 @@ object ExitCommand : ConsoleCommand {
         get() = "Stops commands parsing and rolls back all changes in storage"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println("Rolling back changes...")
         storage.rollback()

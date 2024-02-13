@@ -13,7 +13,7 @@ object ReverseCommand : ConsoleCommand {
         get() = "Reverses entities order in storage"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println("Reversing...")
         storage.reverseInline()

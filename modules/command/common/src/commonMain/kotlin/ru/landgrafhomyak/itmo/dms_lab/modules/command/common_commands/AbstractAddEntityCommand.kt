@@ -11,16 +11,9 @@ abstract class AbstractAddEntityCommand : ConsoleCommand {
     @Suppress("FunctionName")
     protected abstract suspend fun _finishTransaction(transaction: EntityCreationTransaction)
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
         val transaction = storage.startEntityCreating()
         try {
-            io.fillEntity(transaction)
-            if (io.finishArgsReading()) {
-                io.setStyle(ConsoleTextStyle.ERROR)
-                io.println("Entity creating failed")
-                io.setStyle(ConsoleTextStyle.DEFAULT)
-                return
-            }
+            io.fillEntity(io.argsOrEmpty, transaction)
             this._finishTransaction(transaction)
         } catch (e1: Throwable) {
             try {

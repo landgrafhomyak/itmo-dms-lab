@@ -22,9 +22,8 @@ abstract class AbstractRemoveByEntityFilterCommand(
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         val splitterEntity = EntityMapImpl(this.rootEntityDescriptor)
-        io.fillEntity(splitterEntity)
+        io.fillEntity(io.argsOrEmpty, splitterEntity)
         this.rootEntityDescriptor.assertAllAttributesSet(splitterEntity)
-        if (io.finishArgsReading()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println(this._startingMessage)
         try {

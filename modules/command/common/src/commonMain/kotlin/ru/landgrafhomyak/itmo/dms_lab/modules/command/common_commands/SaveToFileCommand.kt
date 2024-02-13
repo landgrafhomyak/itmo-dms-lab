@@ -13,7 +13,7 @@ class SaveToFileCommand(private val filename: String? = null) : ConsoleCommand {
         get() = "Saves all changes to file (from which it was loaded)"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         if (this.filename == null)
             io.println("Saving storage...")

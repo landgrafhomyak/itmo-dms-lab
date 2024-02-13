@@ -14,7 +14,7 @@ abstract class AbstractRemoveByStaticFilterCommand : ConsoleCommand {
     protected abstract fun _buildFilter(storage: StorageClientLayer): Filter
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println(this._startingMessage)
         try {

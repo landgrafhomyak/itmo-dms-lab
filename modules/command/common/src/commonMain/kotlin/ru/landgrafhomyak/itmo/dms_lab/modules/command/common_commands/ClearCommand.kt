@@ -13,7 +13,7 @@ object ClearCommand : ConsoleCommand {
         get() = "Removes all entities from storage"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println("Clearing storage...")
         storage.clear()

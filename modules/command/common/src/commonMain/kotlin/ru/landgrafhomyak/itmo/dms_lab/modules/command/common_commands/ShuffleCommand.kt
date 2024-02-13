@@ -13,7 +13,7 @@ object ShuffleCommand : ConsoleCommand {
         get() = "Reorders entities in storage in random order"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
-        if (io.finishArgsReading()) return
+        if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println("Shuffling...")
         storage.reverseInline()
