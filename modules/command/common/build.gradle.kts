@@ -13,8 +13,9 @@ kotlin {
             dependencies {
                 implementation(project(":modules:entity"))
                 implementation(project(":modules:console"))
-                implementation(project(":modules:command"))
+                implementation(project(":modules:console:default-engine"))
                 implementation(project(":modules:storage-client-layer"))
+                implementation(project(":modules:command"))
             }
         }
         val commonTest by getting {

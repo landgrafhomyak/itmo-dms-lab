@@ -1,0 +1,39 @@
+package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
+
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.EntityCreationTransaction
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
+
+abstract class AbstractAddEntityCommand : ConsoleCommand {
+    @Suppress("FunctionName")
+    protected abstract suspend fun _finishTransaction(transaction: EntityCreationTransaction)
+    override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
+        if (io.finishArgsReading()) return
+        val transaction = storage.startEntityCreating()
+        try {
+            io.fillEntity(transaction)
+            if (io.finishArgsReading()) {
+                io.setStyle(ConsoleTextStyle.ERROR)
+                io.println("Entity creating failed")
+                io.setStyle(ConsoleTextStyle.DEFAULT)
+                return
+            }
+            this._finishTransaction(transaction)
+        } catch (e1: Throwable) {
+            try {
+                io.setStyle(ConsoleTextStyle.ERROR)
+                io.println("Entity creating failed")
+                io.setStyle(ConsoleTextStyle.DEFAULT)
+                transaction.cancelCreating()
+                return
+            } catch (e2: Throwable) {
+                e1.addSuppressed(e2)
+            }
+            throw e1
+        }
+    }
+
+}

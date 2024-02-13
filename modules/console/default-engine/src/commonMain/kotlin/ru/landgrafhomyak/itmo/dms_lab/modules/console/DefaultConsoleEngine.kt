@@ -1,12 +1,12 @@
 package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
 
-import ru.landgrafhomyak.itmo.dms_lab.modules.action.ActionIoProvider
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.PrefixedConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
-import ru.landgrafhomyak.itmo.dms_lab.modules.action.Environment
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.ArgsParser
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
@@ -14,7 +14,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 
 class DefaultConsoleEngine(
     private val console: ConsoleInterface,
-    private val environment: Environment,
+    private val environment: ConsoleCommandEnvironment,
     private val storage: StorageClientLayer,
 ) {
     private val spaceRegexp = Regex("""\s+""")
@@ -36,18 +36,18 @@ class DefaultConsoleEngine(
                 .trimStart()
                 .split(this.spaceRegexp, 2)
                 .let { l -> l.first() to l.getOrNull(1) }
-            val command = this.environment.actionsSet.dispatchCommand(extractedRawCommand)
+            val command = this.environment.commandsSet.dispatchCommand(extractedRawCommand)
             if (command == null) {
                 this.console.setStyle(ConsoleTextStyle.ERROR)
-                this.console.println("Unknown action")
+                this.console.println("Unknown command")
                 this.console.setStyle(ConsoleTextStyle.DEFAULT)
                 continue
             }
-            this.environment.addActionToHistory(command)
-            val io = this.ActionIoProviderImpl(firstLine)
+            this.environment.addCommandToHistory(command)
+            val io = this.ConsoleCommandIoProviderImpl(firstLine)
 
             try {
-                command.executeIO(this.storage, io, this.environment)
+                command.execute(this.storage, io, this.environment)
             } catch (_: StopConsoleInteraction) {
                 this.console.setStyle(ConsoleTextStyle.UTILITY)
                 this.console.println("Console stopped by action")
@@ -55,7 +55,7 @@ class DefaultConsoleEngine(
                 break
             } catch (t: Throwable) {
                 this.console.setStyle(ConsoleTextStyle.UTILITY)
-                this.console.println("Uncaught error wile running action")
+                this.console.println("Uncaught error wile running command")
                 this.console.setStyle(ConsoleTextStyle.ERROR)
                 this.console.println(t.stackTraceToString())
             } finally {
@@ -65,9 +65,9 @@ class DefaultConsoleEngine(
         }
     }
 
-    private inner class ActionIoProviderImpl(
+    private inner class ConsoleCommandIoProviderImpl(
         private var firstLine: String?
-    ) : ActionIoProvider {
+    ) : ConsoleCommandIoProvider {
         var isReadable = true
         var isWritable = true
 
@@ -124,7 +124,7 @@ class DefaultConsoleEngine(
             this.isReadable = false
             if (this.firstLine != null) {
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
-                this@DefaultConsoleEngine.innerConsole.println("This action doesn't has simple arguments")
+                this@DefaultConsoleEngine.innerConsole.println("This command doesn't has simple arguments")
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
             }
             val rawArgs = this.readln()
