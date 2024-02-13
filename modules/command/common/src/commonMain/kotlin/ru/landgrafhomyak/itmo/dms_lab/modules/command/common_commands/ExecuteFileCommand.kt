@@ -3,10 +3,10 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
+import ru.landgrafhomyak.itmo.dms_lab.modules.console.DefaultConsoleEngine
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.PrintOnInputConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.InputConsoleInterface
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.engine.DefaultConsoleEngine
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
 object ExecuteFileCommand : ConsoleCommand {

@@ -1,15 +1,12 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.console.engine
+package ru.landgrafhomyak.itmo.dms_lab.modules.console
 
+import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleInterface
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.PrefixedConsoleWrapper
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
-import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.ArgsParser
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 
 
 class DefaultConsoleEngine(
@@ -27,9 +24,7 @@ class DefaultConsoleEngine(
             val rawCommand = this.console.readln()
             this.console.setStyle(ConsoleTextStyle.DEFAULT)
             if (rawCommand == null) {
-                this.console.setStyle(ConsoleTextStyle.UTILITY)
-                this.console.println("\nInput stream ended, exiting")
-                this.console.setStyle(ConsoleTextStyle.DEFAULT)
+                this._printEof()
                 return
             }
             val (extractedRawCommand, firstLine) = rawCommand
@@ -61,8 +56,19 @@ class DefaultConsoleEngine(
             } finally {
                 io.isWritable = false
                 io.isReadable = false
+                if (io.eofReached) {
+                    this._printEof()
+                    break
+                }
             }
         }
+    }
+
+    @Suppress("FunctionName")
+    private suspend fun _printEof() {
+        this.console.setStyle(ConsoleTextStyle.UTILITY)
+        this.console.println("\nInput stream ended, exiting")
+        this.console.setStyle(ConsoleTextStyle.DEFAULT)
     }
 
     private inner class ConsoleCommandIoProviderImpl(
@@ -70,6 +76,8 @@ class DefaultConsoleEngine(
     ) : ConsoleCommandIoProvider {
         var isReadable = true
         var isWritable = true
+        var eofReached = false
+            private set
 
         @Suppress("FunctionName")
         private fun _assertIsWritable() {
@@ -83,7 +91,10 @@ class DefaultConsoleEngine(
 
         override suspend fun readln(): String? {
             this._assertIsReadable()
-            return this@DefaultConsoleEngine.innerConsole.readln()
+            val line = this@DefaultConsoleEngine.innerConsole.readln()
+            if (line == null)
+                this.eofReached = true
+            return line
         }
 
         override suspend fun print(s: String) {
