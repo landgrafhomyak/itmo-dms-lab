@@ -27,7 +27,6 @@ abstract class FullRewriteLocalCopyStorage private constructor(
     private val globalMutex = Mutex()
     protected abstract val checkpoint: MutableList<EntityAccessor>
     protected abstract val changes: MutableList<EntityAccessor>
-    protected abstract fun assertAllFilled(entity: EntityAccessor)
 
     @Suppress("UNCHECKED_CAST")
     private val _checkpoint: MutableList<LocalEntity>
@@ -146,7 +145,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         suspend fun _finishCreating() {
             this.data.isMutable = false
             this@FullRewriteLocalCopyStorage.globalMutex.withLock {
-                this@FullRewriteLocalCopyStorage.assertAllFilled(this.data)
+                this@FullRewriteLocalCopyStorage.rootEntityDescriptor.assertAllAttributesSet(this.data)
                 this@FullRewriteLocalCopyStorage.changes.add(this.data)
             }
         }
@@ -382,7 +381,7 @@ abstract class FullRewriteLocalCopyStorage private constructor(
                 }
 
                 override val descriptor: EntityDescriptor
-                    get() = this@UpdaterImpl._assertActive { this.attribute.targetEntity }
+                    get() = this@UpdaterImpl._assertActive { this.attribute.targetEntityDescriptor }
 
                 private val _cache = HashMap<EntityAttributeDescriptor.ComplexAttribute, RecursiveUpdater>()
 

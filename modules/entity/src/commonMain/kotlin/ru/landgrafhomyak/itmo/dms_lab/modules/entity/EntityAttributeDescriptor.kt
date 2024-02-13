@@ -21,7 +21,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
     }
 
     sealed class ComplexAttribute(
-        val targetEntity: EntityDescriptor,
+        val targetEntityDescriptor: EntityDescriptor,
         name: String,
         masterDescriptor: EntityDescriptor
     ) : EntityAttributeDescriptor<EntityAccessor, EntityMutator>(name, false, masterDescriptor),

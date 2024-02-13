@@ -257,7 +257,7 @@ class DefaultConsoleEngine(
             for (d in complex) {
                 val recEntity = entity[d]
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.UTILITY)
-                this@DefaultConsoleEngine.innerConsole.print("${">".repeat(depth.toInt())} {${d.targetEntity.name}} ")
+                this@DefaultConsoleEngine.innerConsole.print("${">".repeat(depth.toInt())} {${d.targetEntityDescriptor.name}} ")
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.HIGHLIGHT)
                 this@DefaultConsoleEngine.innerConsole.print(d.name)
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.UTILITY)
