@@ -43,11 +43,6 @@ class DefaultConsoleEngine(
 
             try {
                 command.execute(this.storage, io, this.environment)
-            } catch (_: StopConsoleInteraction) {
-                this.console.setStyle(ConsoleTextStyle.UTILITY)
-                this.console.println("Console stopped by action")
-                this.console.setStyle(ConsoleTextStyle.DEFAULT)
-                break
             } catch (t: Throwable) {
                 this.console.setStyle(ConsoleTextStyle.UTILITY)
                 this.console.println("Uncaught error wile running command")
@@ -58,6 +53,12 @@ class DefaultConsoleEngine(
                 io.isReadable = false
                 if (io.eofReached) {
                     this._printEof()
+                    break
+                }
+                if (io.consoleStopRequested) {
+                    this.console.setStyle(ConsoleTextStyle.UTILITY)
+                    this.console.println("Console stopped by action")
+                    this.console.setStyle(ConsoleTextStyle.DEFAULT)
                     break
                 }
             }
@@ -77,6 +78,9 @@ class DefaultConsoleEngine(
         var isReadable = true
         var isWritable = true
         var eofReached = false
+            private set
+
+        var consoleStopRequested = false
             private set
 
         @Suppress("FunctionName")
@@ -139,6 +143,10 @@ class DefaultConsoleEngine(
                 return true
             }
             return false
+        }
+
+        override fun scheduleConsoleStop() {
+            this.consoleStopRequested = true
         }
 
         @Suppress("FunctionName")

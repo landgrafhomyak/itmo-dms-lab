@@ -3,7 +3,6 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
-import ru.landgrafhomyak.itmo.dms_lab.modules.console.StopConsoleInteraction
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
@@ -19,6 +18,6 @@ object ExitCommand : ConsoleCommand {
         io.println("Rolling back changes...")
         storage.rollback()
         io.println("Stopping console...")
-        throw StopConsoleInteraction()
+        io.scheduleConsoleStop()
     }
 }

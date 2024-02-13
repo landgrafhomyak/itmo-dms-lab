@@ -19,4 +19,9 @@ interface ConsoleCommandIoProvider : ConsoleInterface {
      * @return `true` if assertion failed (e.g., unread args left)
      */
     suspend fun assertNoArgs(): Boolean
+
+    /**
+     * Says engine to stop commands parsing after finishing this command.
+     */
+    fun scheduleConsoleStop()
 }
