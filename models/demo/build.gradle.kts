@@ -7,10 +7,12 @@ kotlin {
         jvmToolchain(8)
         withJava()
     }
+    js()
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:common"))
+                implementation(project(":modules:command"))
+                implementation(project(":modules:command:universal"))
             }
         }
         val commonTest by getting {

@@ -8,3 +8,7 @@ include(":modules:storage-client-layer:local-copy")
 include(":modules:storage-client-layer:remote")
 include(":modules:command")
 include(":modules:command:universal")
+
+include(":models:demo")
+
+include(":apps:demo:lab5")
