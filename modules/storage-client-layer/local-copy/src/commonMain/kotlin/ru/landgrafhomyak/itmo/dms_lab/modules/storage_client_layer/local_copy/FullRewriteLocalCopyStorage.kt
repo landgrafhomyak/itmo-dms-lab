@@ -487,58 +487,77 @@ abstract class FullRewriteLocalCopyStorage private constructor(
     }
 
 
-    private inner class FilterReceiverImpl(
-    ) : FilterReceiver {
-
-        var collected: Map<Int, LocalEntity>? = null
-            private set
+    private inner class FilterReceiverImpl : FilterReceiver {
+        var isActive = true
 
         @Suppress("FunctionName")
-        private fun _formatIndex2EntityMap() = buildMap map@{
+        private fun _assertIsActive() {
+            if (!this.isActive)
+                throw IllegalStateException("This filter already applied")
+        }
+
+        var collected: Map<Int, LocalEntity> = buildMap map@{
             this@FullRewriteLocalCopyStorage._changes.forEachIndexed { i, e ->
                 this@map[i] = e
             }
         }
+            private set
+
+        var anySelected = false
+            private set
 
         override suspend fun all() {
-            this.collected = this.collected ?: this._formatIndex2EntityMap()
+            this._assertIsActive()
+            this.anySelected = true
         }
 
         override suspend fun <T : Comparable<T>> filterLower(attr: EntityAttributeDescriptor<T, *>, value: T) {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected
                 .filterValues { v -> (v[attr] ?: return@filterValues false) < value }
         }
 
         override suspend fun filterLower(than: EntityAccessor) {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected
                 .filterValues { v -> this@FullRewriteLocalCopyStorage.rootEntityDescriptor.compare(v, than) < 0 }
         }
 
         override suspend fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T?) {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected
                 .filterValues { v -> (v[attr] ?: return@filterValues false) == value }
         }
 
         override suspend fun <T : Comparable<T>> filterGreater(attr: EntityAttributeDescriptor<T, *>, value: T) {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected
                 .filterValues { v -> (v[attr] ?: return@filterValues false) > value }
         }
 
         override suspend fun filterGreater(than: EntityAccessor) {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected
                 .filterValues { v -> this@FullRewriteLocalCopyStorage.rootEntityDescriptor.compare(v, than) > 0 }
         }
 
         override suspend fun firstOnly() {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap()).let { c ->
-                return@let c.entries.minByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: return@let emptyMap()
-            }
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected.entries
+                .minByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: emptyMap()
         }
 
         override suspend fun lastOnly() {
-            this.collected = (this.collected ?: this._formatIndex2EntityMap()).let { c ->
-                return@let c.entries.maxByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: return@let emptyMap()
-            }
+            this._assertIsActive()
+            this.anySelected = true
+            this.collected = this.collected.entries
+                .maxByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: emptyMap()
         }
     }
 
@@ -548,7 +567,10 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         try {
             val receiver = this.FilterReceiverImpl()
             filter.build(receiver)
-            return this.ActionTransactionImpl(mutexOwner, receiver.collected ?: throw IllegalArgumentException("Filter selects nothing"))
+            receiver.isActive = false
+            if (!receiver.anySelected)
+                throw IllegalArgumentException("Filter selects nothing")
+            return this.ActionTransactionImpl(mutexOwner, receiver.collected)
         } catch (e: Throwable) {
             this.globalMutex.unlock(mutexOwner)
             throw e
