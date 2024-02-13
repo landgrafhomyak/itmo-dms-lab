@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
+package ru.landgrafhomyak.itmo.dms_lab.modules.command.universal_commands
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
@@ -6,17 +6,17 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
-object HistoryCommand : ConsoleCommand {
+object ShuffleCommand : ConsoleCommand {
     override val name: String
-        get() = "save"
+        get() = "shuffles"
     override val description: String
-        get() = "Saves all changes to file (from which it was loaded)"
+        get() = "Reorders entities in storage in random order"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
-        for (a in environment.commandHistory) {
-            io.println(a.name)
-        }
+        io.println("Shuffling...")
+        storage.reverseInline()
+        io.println("Shuffled!")
     }
 }

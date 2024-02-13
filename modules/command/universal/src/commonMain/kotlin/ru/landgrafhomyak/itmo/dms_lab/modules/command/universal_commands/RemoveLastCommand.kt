@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
+package ru.landgrafhomyak.itmo.dms_lab.modules.command.universal_commands
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Filter
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.common_filters.SelectLastFilter

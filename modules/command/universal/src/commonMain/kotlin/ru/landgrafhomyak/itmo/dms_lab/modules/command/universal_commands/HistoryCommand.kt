@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
+package ru.landgrafhomyak.itmo.dms_lab.modules.command.universal_commands
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
@@ -6,17 +6,17 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
-object ClearCommand : ConsoleCommand {
+object HistoryCommand : ConsoleCommand {
     override val name: String
-        get() = "clear"
+        get() = "save"
     override val description: String
-        get() = "Removes all entities from storage"
+        get() = "Saves all changes to file (from which it was loaded)"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
-        io.println("Clearing storage...")
-        storage.clear()
-        io.println("Storage cleared")
+        for (a in environment.commandHistory) {
+            io.println(a.name)
+        }
     }
 }

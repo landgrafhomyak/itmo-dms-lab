@@ -1,4 +1,4 @@
-package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
+package ru.landgrafhomyak.itmo.dms_lab.modules.command.universal_commands
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommand
 import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandIoProvider
@@ -6,17 +6,17 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.command.ConsoleCommandEnvironment
 import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 
-object ShuffleCommand : ConsoleCommand {
+object ClearCommand : ConsoleCommand {
     override val name: String
-        get() = "shuffles"
+        get() = "clear"
     override val description: String
-        get() = "Reorders entities in storage in random order"
+        get() = "Removes all entities from storage"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
-        io.println("Shuffling...")
-        storage.reverseInline()
-        io.println("Shuffled!")
+        io.println("Clearing storage...")
+        storage.clear()
+        io.println("Storage cleared")
     }
 }
