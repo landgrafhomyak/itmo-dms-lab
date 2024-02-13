@@ -17,8 +17,7 @@ abstract class AbstractRemoveByEntityFilterCommand(
     @Suppress("PropertyName")
     protected abstract val _startingMessage: String
 
-    @Suppress("FunctionName")
-    protected abstract fun _buildFilter(storage: StorageClientLayer, entity: EntityAccessor): Filter
+    protected abstract fun buildFilter(entity: EntityAccessor): Filter
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         val splitterEntity = EntityMapImpl(this.rootEntityDescriptor)
@@ -27,7 +26,7 @@ abstract class AbstractRemoveByEntityFilterCommand(
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println(this._startingMessage)
         try {
-            storage.startActionByFilter(this._buildFilter(storage, splitterEntity)).delete()
+            storage.startActionByFilter(this.buildFilter(splitterEntity)).delete()
         } catch (t: Throwable) {
             io.setStyle(ConsoleTextStyle.ERROR)
             io.println("Failed to remove")

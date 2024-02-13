@@ -3,7 +3,7 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.command.common_commands
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAccessor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Filter
-import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.common_filters.SelectGreaterThanEntityFilter
 
 class RemoveGreaterCommand(rootEntityDescriptor: EntityDescriptor) : AbstractRemoveByEntityFilterCommand(rootEntityDescriptor) {
 
@@ -14,6 +14,6 @@ class RemoveGreaterCommand(rootEntityDescriptor: EntityDescriptor) : AbstractRem
     override val _startingMessage: String
         get() = "Removing elements that are greater than specified..."
 
-    override fun _buildFilter(storage: StorageClientLayer, entity: EntityAccessor): Filter =
-        storage.startFilterCreating().filterGreater(entity).build()
+    override fun buildFilter(entity: EntityAccessor): Filter =
+        SelectGreaterThanEntityFilter(entity)
 }

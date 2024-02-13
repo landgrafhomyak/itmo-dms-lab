@@ -10,15 +10,16 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Stor
 abstract class AbstractRemoveByStaticFilterCommand : ConsoleCommand {
     @Suppress("PropertyName")
     protected abstract val _startingMessage: String
+
     @Suppress("FunctionName")
-    protected abstract fun _buildFilter(storage: StorageClientLayer): Filter
+    protected abstract val filter: Filter
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         if (io.assertNoArgs()) return
         io.setStyle(ConsoleTextStyle.DEFAULT)
         io.println(this._startingMessage)
         try {
-            storage.startActionByFilter(this._buildFilter(storage)).delete()
+            storage.startActionByFilter(this.filter).delete()
         } catch (t: Throwable) {
             io.setStyle(ConsoleTextStyle.ERROR)
             io.println("Failed to remove")
