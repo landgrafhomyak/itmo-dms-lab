@@ -2,7 +2,7 @@ package ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract
 
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
-import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.CommonFilterBuilderImpl
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.common_filters.SelectAllFilter
 
 /**
  * Client's interface to access storage (doesn't matter is it in memory, in file or remote)
@@ -26,16 +26,13 @@ interface StorageClientLayer {
     suspend fun rollback()
 
     suspend fun clear() {
-        this.startActionByFilter(this.startFilterCreating().all().build()).delete()
+        this.startActionByFilter(SelectAllFilter).delete()
     }
 
     /**
      * Starts transaction for creating entity.
      */
     fun startEntityCreating(): EntityCreationTransaction
-
-
-    fun startFilterCreating(): FilterBuilder = CommonFilterBuilderImpl(this.rootEntityDescriptor)
 
     /**
      * Starts universal transaction.

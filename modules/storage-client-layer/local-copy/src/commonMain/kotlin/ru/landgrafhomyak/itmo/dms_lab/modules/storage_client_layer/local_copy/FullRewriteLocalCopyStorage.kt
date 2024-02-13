@@ -13,6 +13,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Acti
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.CountByGroupFetcher
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.EntityCreationTransaction
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Filter
+import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.FilterReceiver
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageClientLayer
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageEntityReader
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.StorageEntityUpdater
@@ -485,54 +486,69 @@ abstract class FullRewriteLocalCopyStorage private constructor(
         }
     }
 
-    @Suppress("FunctionName")
-    private fun _formatIndex2EntityMap() = buildMap map@{
-        this@FullRewriteLocalCopyStorage._changes.forEachIndexed { i, e ->
-            this@map[i] = e
+
+    private inner class FilterReceiverImpl(
+    ) : FilterReceiver {
+
+        var collected: Map<Int, LocalEntity>? = null
+            private set
+
+        @Suppress("FunctionName")
+        private fun _formatIndex2EntityMap() = buildMap map@{
+            this@FullRewriteLocalCopyStorage._changes.forEachIndexed { i, e ->
+                this@map[i] = e
+            }
+        }
+
+        override suspend fun all() {
+            this.collected = this.collected ?: this._formatIndex2EntityMap()
+        }
+
+        override suspend fun <T : Comparable<T>> filterLower(attr: EntityAttributeDescriptor<T, *>, value: T) {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+                .filterValues { v -> (v[attr] ?: return@filterValues false) < value }
+        }
+
+        override suspend fun filterLower(than: EntityAccessor) {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+                .filterValues { v -> this@FullRewriteLocalCopyStorage.rootEntityDescriptor.compare(v, than) < 0 }
+        }
+
+        override suspend fun <T : Comparable<T>> filterEqual(attr: EntityAttributeDescriptor<T, *>, value: T?) {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+                .filterValues { v -> (v[attr] ?: return@filterValues false) == value }
+        }
+
+        override suspend fun <T : Comparable<T>> filterGreater(attr: EntityAttributeDescriptor<T, *>, value: T) {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+                .filterValues { v -> (v[attr] ?: return@filterValues false) > value }
+        }
+
+        override suspend fun filterGreater(than: EntityAccessor) {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap())
+                .filterValues { v -> this@FullRewriteLocalCopyStorage.rootEntityDescriptor.compare(v, than) > 0 }
+        }
+
+        override suspend fun firstOnly() {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap()).let { c ->
+                return@let c.entries.minByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: return@let emptyMap()
+            }
+        }
+
+        override suspend fun lastOnly() {
+            this.collected = (this.collected ?: this._formatIndex2EntityMap()).let { c ->
+                return@let c.entries.maxByOrNull { (k, _) -> k }?.let { (k, v) -> mapOf(k to v) } ?: return@let emptyMap()
+            }
         }
     }
 
     override suspend fun startActionByFilter(filter: Filter): ActionTransaction {
         val mutexOwner = Any()
         this.globalMutex.lock(mutexOwner)
-        var collected: Map<Int, LocalEntity>? = null
         try {
-            for (constraint in filter) {
-                when (constraint) {
-                    Filter.Action.All ->
-                        collected = collected ?: this._formatIndex2EntityMap()
-
-                    is Filter.Action.CompareAttribute<*> ->
-                        collected = (collected ?: this._formatIndex2EntityMap()).filterValues { v ->
-                            val compilationResult = constraint.compare(v) ?: return@filterValues false
-                            when (constraint.direction) {
-                                Filter.Action.ComparatorDirection.LOWER -> compilationResult < 0
-                                Filter.Action.ComparatorDirection.EQUAL -> compilationResult == 0
-                                Filter.Action.ComparatorDirection.GREATER -> compilationResult > 0
-                            }
-                        }
-
-                    is Filter.Action.CompareAttributeNull -> {
-                        collected = (collected ?: this._formatIndex2EntityMap())
-                            .filterValues { v -> v[constraint.attribute] == null }
-                    }
-
-                    is Filter.Action.CompareEntity ->
-                        collected = (collected ?: this._formatIndex2EntityMap()).filterValues { v ->
-                            when (constraint.direction) {
-                                Filter.Action.ComparatorDirection.LOWER -> this.rootEntityDescriptor.compare(v, constraint.targetEntity) < 0
-                                Filter.Action.ComparatorDirection.EQUAL -> this.rootEntityDescriptor.compare(v, constraint.targetEntity) == 0
-                                Filter.Action.ComparatorDirection.GREATER -> this.rootEntityDescriptor.compare(v, constraint.targetEntity) > 0
-                            }
-                        }
-
-                    Filter.Action.FirstOnly -> collected = (collected ?: this._formatIndex2EntityMap()).let { c ->
-                        val minKey = c.keys.minOrNull() ?: return@let emptyMap()
-                        return@let mapOf(minKey to c[minKey]!!)
-                    }
-                }
-            }
-            return this.ActionTransactionImpl(mutexOwner, collected ?: throw IllegalArgumentException("Filter selects nothing"))
+            val receiver = this.FilterReceiverImpl()
+            filter.build(receiver)
+            return this.ActionTransactionImpl(mutexOwner, receiver.collected ?: throw IllegalArgumentException("Filter selects nothing"))
         } catch (e: Throwable) {
             this.globalMutex.unlock(mutexOwner)
             throw e
