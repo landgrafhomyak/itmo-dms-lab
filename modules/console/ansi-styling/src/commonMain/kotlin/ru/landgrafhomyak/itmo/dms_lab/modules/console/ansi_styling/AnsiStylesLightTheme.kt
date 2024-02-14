@@ -4,7 +4,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.console.abstract.ConsoleTextStyle
 
 object AnsiStylesLightTheme: AnsiStyles {
     override fun get(style: ConsoleTextStyle): String = when(style) {
-        ConsoleTextStyle.DEFAULT -> "\u001B[40m\u001B[24m"
+        ConsoleTextStyle.DEFAULT -> "\u001B[30m\u001B[24m"
         ConsoleTextStyle.UTILITY -> "\u001B[90m\u001B[24m"
         ConsoleTextStyle.INPUT -> "\u001B[32m\u001B[24m"
         ConsoleTextStyle.ERROR -> "\u001B[31m\u001B[24m"

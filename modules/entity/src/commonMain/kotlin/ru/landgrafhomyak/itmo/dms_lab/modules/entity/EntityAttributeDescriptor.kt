@@ -20,7 +20,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
         fun checkValid(value: T): Boolean
     }
 
-    sealed class ComplexAttribute(
+    open class ComplexAttribute(
         val targetEntityDescriptor: EntityDescriptor,
         name: String,
         masterDescriptor: EntityDescriptor
@@ -62,7 +62,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
             name: String,
             masterDescriptor: EntityDescriptor
         ) : EntityAttributeDescriptor.FloatAttribute(name, false, masterDescriptor),
-            _Required<EntityAccessor, EntityMutator>
+            _Required<Double, Double>
     }
 
     sealed class StringAttribute(
@@ -81,7 +81,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
             name: String,
             masterDescriptor: EntityDescriptor
         ) : EntityAttributeDescriptor.StringAttribute(name, false, masterDescriptor),
-            _Required<EntityAccessor, EntityMutator>
+            _Required<String, String>
     }
 
     sealed class BooleanAttribute(
@@ -99,7 +99,7 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
             name: String,
             masterDescriptor: EntityDescriptor
         ) : EntityAttributeDescriptor.BooleanAttribute(name, false, masterDescriptor),
-            _Required<EntityAccessor, EntityMutator>
+            _Required<Boolean, Boolean>
     }
 
     sealed class EnumAttribute<T : Enum<T>>(
@@ -122,6 +122,6 @@ sealed class EntityAttributeDescriptor<out R : Any, in W : Any>(
             name: String,
             masterDescriptor: EntityDescriptor
         ) : EntityAttributeDescriptor.EnumAttribute<T>(name, false, masterDescriptor),
-            _Required<EntityAccessor, EntityMutator>
+            _Required<T, T>
     }
 }

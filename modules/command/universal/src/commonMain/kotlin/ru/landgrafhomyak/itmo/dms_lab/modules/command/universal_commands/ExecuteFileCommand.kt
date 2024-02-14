@@ -43,6 +43,6 @@ object ExecuteFileCommand : ConsoleCommand {
 
         val recConsole = PrintOnInputConsoleWrapper(fileInput, io)
         val recEngine = DefaultConsoleEngine(recConsole, recEnvironment, storage)
-        recEngine.mainloop()
+        recEngine.serveForever()
     }
 }

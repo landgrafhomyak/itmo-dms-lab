@@ -16,7 +16,7 @@ class DefaultConsoleEngine(
 ) {
     private val spaceRegexp = Regex("""\s+""")
     private val innerConsole = PrefixedConsoleWrapper("|", this.console)
-    suspend fun mainloop() {
+    suspend fun serveForever() {
         while (true) {
             this.console.setStyle(ConsoleTextStyle.UTILITY)
             this.console.print("> ")

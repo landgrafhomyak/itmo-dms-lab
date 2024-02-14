@@ -81,11 +81,17 @@ abstract class QueuedConsole(private val maxPendingRequests: UInt = DEFAULT_MAX_
     override suspend fun setStyle(style: ConsoleTextStyle) =
         this._offerRequest(Request.SetStyle(style))
 
-    fun executor() {
+    fun serverForever() {
         while (true) {
             val request: Request<*>?
             this.mutex.withLock {
                 request = this.firstRequest
+                if (request != null) {
+                    val next = request.next
+                    this.firstRequest = next
+                    if (next == null)
+                        this.lastRequest = null
+                }
             }
             if (request == null) {
                 synchronized(this.notifier) {
