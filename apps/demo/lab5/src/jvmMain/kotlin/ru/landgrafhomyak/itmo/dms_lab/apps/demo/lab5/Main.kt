@@ -31,22 +31,23 @@ object Main {
     @JvmStatic
     fun main(arv: Array<String>) {
         val commands = ConsoleCommandsSetMapImpl(
-                    AddEntityCommand,
-                    AddEntityIfMaxCommand,
-                    AddEntityIfMinCommand,
-                    ClearCommand,
-                    ExecuteFileCommand,
-                    ExitCommand,
-                    HistoryCommand,
-                    ListCommandsCommand(),
-                    RemoveFirstCommand,
-                    RemoveGreaterCommand(DemoRootEntityDescriptor),
-                    RemoveHeadCommand,
-                    RemoveLastCommand,
-                    RemoveLowerCommand(DemoRootEntityDescriptor),
-                    RemoveTailCommand,
-                    ReverseCommand,
-                    ShuffleCommand
+            AddEntityCommand,
+            AddEntityIfMaxCommand,
+            AddEntityIfMinCommand,
+            ClearCommand,
+            ExecuteFileCommand,
+            ExitCommand,
+            HistoryCommand,
+            ListCommandsCommand(),
+            RemoveFirstCommand,
+            RemoveGreaterCommand(DemoRootEntityDescriptor),
+            RemoveHeadCommand,
+            RemoveLastCommand,
+            RemoveLowerCommand(DemoRootEntityDescriptor),
+            RemoveTailCommand,
+            ReverseCommand,
+            ShuffleCommand,
+            ShowCommand
         )
 
 

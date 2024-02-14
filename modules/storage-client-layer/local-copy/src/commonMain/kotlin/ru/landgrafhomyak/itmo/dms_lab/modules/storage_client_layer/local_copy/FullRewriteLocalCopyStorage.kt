@@ -95,7 +95,6 @@ abstract class FullRewriteLocalCopyStorage(
         }
 
         override fun <T : Any> get(attribute: EntityAttributeDescriptor<T, *>): T? {
-            this._assertIsMutable()
             @Suppress("UNCHECKED_CAST")
             return this.data[attribute] as T?
         }
