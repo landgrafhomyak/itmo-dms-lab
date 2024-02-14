@@ -26,7 +26,7 @@ class ListCommandsCommand(private val maxDescriptionWidth: UInt = 120u) : Consol
             anyCommandPrinted = true
             io.setStyle(ConsoleTextStyle.HIGHLIGHT)
             io.println(command.name)
-            io.setStyle(ConsoleTextStyle.TIP)
+            indentedConsole.setStyle(ConsoleTextStyle.TIP)
             command.description
                 .chunked(this.maxDescriptionWidth.toInt())
                 .forEach { line -> indentedConsole.println(line) }

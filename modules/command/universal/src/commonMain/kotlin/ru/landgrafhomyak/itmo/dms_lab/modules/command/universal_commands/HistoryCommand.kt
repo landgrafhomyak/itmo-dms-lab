@@ -8,12 +8,14 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Stor
 
 object HistoryCommand : ConsoleCommand {
     override val name: String
-        get() = "save"
+        get() = "history"
     override val description: String
-        get() = "Saves all changes to file (from which it was loaded)"
+        get() = "List of last invoked commands ordered from older to newer"
 
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         if (io.assertNoArgs()) return
+        io.setStyle(ConsoleTextStyle.TIP)
+        io.println("List of last ${environment.commandHistory.count()} invoked commands ordered from older to newer")
         io.setStyle(ConsoleTextStyle.DEFAULT)
         for (a in environment.commandHistory) {
             io.println(a.name)
