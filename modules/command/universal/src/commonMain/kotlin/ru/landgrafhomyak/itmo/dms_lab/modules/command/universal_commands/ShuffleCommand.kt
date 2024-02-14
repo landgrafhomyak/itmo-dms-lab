@@ -8,7 +8,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.Stor
 
 object ShuffleCommand : ConsoleCommand {
     override val name: String
-        get() = "shuffles"
+        get() = "shuffle"
     override val description: String
         get() = "Reorders entities in storage in random order"
 

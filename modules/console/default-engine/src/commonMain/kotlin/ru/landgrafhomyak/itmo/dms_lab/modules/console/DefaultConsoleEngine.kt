@@ -165,10 +165,12 @@ class DefaultConsoleEngine(
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.TIP)
                 this@DefaultConsoleEngine.innerConsole.println("To pass optional attribute use two double-quotes \"\"")
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
+                return false
             } else if (args.size > primitive.size) {
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.ERROR)
                 this@DefaultConsoleEngine.innerConsole.println("There ${args.size - primitive.size} extra primitive attributes")
                 this@DefaultConsoleEngine.innerConsole.setStyle(ConsoleTextStyle.DEFAULT)
+                return false
             }
 
             for ((d, a) in (primitive zip args)) {

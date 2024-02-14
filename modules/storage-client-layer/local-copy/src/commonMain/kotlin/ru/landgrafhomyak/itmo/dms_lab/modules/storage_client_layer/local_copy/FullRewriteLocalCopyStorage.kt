@@ -9,6 +9,7 @@ import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityAttributeDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityDescriptor
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMapImpl
 import ru.landgrafhomyak.itmo.dms_lab.modules.entity.EntityMutator
+import ru.landgrafhomyak.itmo.dms_lab.modules.entity.RequiredAttributeNotSetError
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.ActionTransaction
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.CountByGroupFetcher
 import ru.landgrafhomyak.itmo.dms_lab.modules.storage_client_layer.abstract.EntityCreationTransaction
@@ -40,17 +41,20 @@ abstract class FullRewriteLocalCopyStorage(
     open override suspend fun commit() {
         this.checkpoint.clear()
         for (o in this.changes) {
-            val cp = LocalEntity(true)
+            val cp = LocalEntity(true, this.rootEntityDescriptor)
             o.copyInto(cp)
             cp.isMutable = false
             this.checkpoint.add(cp)
         }
     }
 
-    private inner class LocalEntity(isMutable: Boolean = false) : EntityAccessor, EntityMutator {
+    private inner class LocalEntity(
+        isMutable: Boolean = false,
+        override val descriptor: EntityDescriptor
+    ) : EntityAccessor, EntityMutator {
         var isMutable = isMutable
             set(value) {
-                for (attr in this@FullRewriteLocalCopyStorage.rootEntityDescriptor) {
+                for (attr in this.descriptor) {
                     if (attr !is EntityAttributeDescriptor.ComplexAttribute)
                         continue
                     @Suppress("USELESS_CAST")
@@ -61,6 +65,9 @@ abstract class FullRewriteLocalCopyStorage(
                 }
             }
 
+        override fun toString(): String =
+            "<local_entity descriptor='${this.descriptor}' isMutable='${this.isMutable}'>"
+
         private val data: MutableMap<EntityAttributeDescriptor<*, *>, Any?> = HashMap()
 
         @Suppress("FunctionName", "NOTHING_TO_INLINE")
@@ -68,13 +75,9 @@ abstract class FullRewriteLocalCopyStorage(
             if (!this.isMutable) throw IllegalStateException("This entity is not enabled for editing now")
         }
 
-        override val descriptor: EntityDescriptor
-            get() = this@FullRewriteLocalCopyStorage.rootEntityDescriptor
-
-
         override fun get(attribute: EntityAttributeDescriptor.ComplexAttribute): EntityMutator {
             this._assertIsMutable()
-            return this.data[attribute] as? EntityMutator ?: throw RuntimeException("Wrong attribute value")
+            return this.data.getOrPut(attribute) { LocalEntity(true, attribute.targetEntityDescriptor) } as? EntityMutator ?: throw RuntimeException("Wrong attribute value")
         }
 
         @Suppress("INAPPLICABLE_JVM_NAME")
@@ -102,10 +105,9 @@ abstract class FullRewriteLocalCopyStorage(
         override fun <T : Any, A> get(attribute: A): T
                 where A : EntityAttributeDescriptor<T, *>,
                       A : EntityAttributeDescriptor._Required<T, *> {
-            this._assertIsMutable()
             @Suppress("UNCHECKED_CAST")
             return this.data[attribute]
-                .let { v -> v ?: throw RuntimeException("Required attribute not set") }
+                .let { v -> v ?: throw RequiredAttributeNotSetError(attribute, this) }
                 .let { v -> v as T }
         }
     }
@@ -113,7 +115,7 @@ abstract class FullRewriteLocalCopyStorage(
     override suspend fun rollback() {
         this.changes.clear()
         for (o in this.changes) {
-            val cp = LocalEntity(true)
+            val cp = LocalEntity(true, this.rootEntityDescriptor)
             o.copyInto(cp)
             cp.isMutable = false
             this.changes.add(cp)
@@ -127,7 +129,7 @@ abstract class FullRewriteLocalCopyStorage(
     private inner class EntityCreatorImpl private constructor(
         private val data: LocalEntity
     ) : EntityCreationTransaction, EntityAccessor by data, EntityMutator by data {
-        constructor() : this(this@FullRewriteLocalCopyStorage.LocalEntity(true))
+        constructor() : this(this@FullRewriteLocalCopyStorage.LocalEntity(true, this@FullRewriteLocalCopyStorage.rootEntityDescriptor))
 
         private var isActive = true
 
@@ -139,16 +141,13 @@ abstract class FullRewriteLocalCopyStorage(
         override fun cancelCreating() {
             this.isActive = false
             this.data.isMutable = false
-            this@FullRewriteLocalCopyStorage.globalMutex.unlock()
         }
 
         @Suppress("FunctionName")
         suspend fun _finishCreating() {
             this.data.isMutable = false
-            this@FullRewriteLocalCopyStorage.globalMutex.withLock {
-                this@FullRewriteLocalCopyStorage.rootEntityDescriptor.assertAllAttributesSet(this.data)
-                this@FullRewriteLocalCopyStorage.changes.add(this.data)
-            }
+            this@FullRewriteLocalCopyStorage.rootEntityDescriptor.assertAllAttributesSet(this.data)
+            this@FullRewriteLocalCopyStorage.changes.add(this.data)
         }
 
         override suspend fun finishCreating() =

@@ -13,7 +13,13 @@ abstract class AbstractAddEntityCommand : ConsoleCommand {
     override suspend fun execute(storage: StorageClientLayer, io: ConsoleCommandIoProvider, environment: ConsoleCommandEnvironment) {
         val transaction = storage.startEntityCreating()
         try {
-            io.fillEntity(io.argsOrEmpty, transaction)
+            if (!io.fillEntity(io.argsOrEmpty, transaction)) {
+                io.setStyle(ConsoleTextStyle.ERROR)
+                io.println("Entity creating failed")
+                io.setStyle(ConsoleTextStyle.DEFAULT)
+                transaction.cancelCreating()
+                return
+            }
             this._finishTransaction(transaction)
         } catch (e1: Throwable) {
             try {
