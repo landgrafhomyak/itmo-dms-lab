@@ -2,6 +2,8 @@ plugins {
     kotlin("multiplatform")
 }
 
+val kotlinxCoroutinesVersion: String by project
+
 kotlin {
     jvm {
         jvmToolchain(8)
@@ -11,7 +13,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":modules:utility"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
+                implementation(project(":modules:console"))
             }
         }
         val commonTest by getting {

@@ -22,7 +22,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmName
 
-abstract class FullRewriteLocalCopyStorage private constructor(
+abstract class FullRewriteLocalCopyStorage(
     override val rootEntityDescriptor: EntityDescriptor,
 ) : StorageClientLayer {
     private val globalMutex = Mutex()
