@@ -13,6 +13,7 @@ kotlin {
             dependencies {
                 implementation(project(":modules:command"))
                 implementation(project(":modules:command:universal"))
+                implementation(project(":modules:entity"))
             }
         }
         val commonTest by getting {
