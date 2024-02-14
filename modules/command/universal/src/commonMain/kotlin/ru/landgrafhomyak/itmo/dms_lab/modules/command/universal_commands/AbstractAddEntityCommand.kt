@@ -21,6 +21,8 @@ abstract class AbstractAddEntityCommand : ConsoleCommand {
                 return
             }
             this._finishTransaction(transaction)
+            io.setStyle(ConsoleTextStyle.DEFAULT)
+            io.println("Created successful!")
         } catch (e1: Throwable) {
             try {
                 io.setStyle(ConsoleTextStyle.ERROR)

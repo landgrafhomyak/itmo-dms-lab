@@ -58,4 +58,11 @@ class PrefixedConsoleWrapper(
         this.style = style
         this.origin.setStyle(style)
     }
+
+    override suspend fun readln(): String? {
+        val line = this.origin.readln()
+        if (line != null)
+            this.isNewLine = true
+        return line
+    }
 }
