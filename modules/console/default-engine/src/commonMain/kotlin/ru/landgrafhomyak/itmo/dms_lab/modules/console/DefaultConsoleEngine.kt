@@ -38,7 +38,6 @@ class DefaultConsoleEngine(
                 this.console.setStyle(ConsoleTextStyle.DEFAULT)
                 continue
             }
-            this.environment.addCommandToHistory(command)
             val io = this.ConsoleCommandIoProviderImpl(firstLine)
 
             try {
@@ -51,15 +50,25 @@ class DefaultConsoleEngine(
             } finally {
                 io.isWritable = false
                 io.isReadable = false
-                if (io.eofReached) {
-                    this._printEof()
-                    break
-                }
-                if (io.consoleStopRequested) {
-                    this.console.setStyle(ConsoleTextStyle.UTILITY)
-                    this.console.println("Console stopped by action")
-                    this.console.setStyle(ConsoleTextStyle.DEFAULT)
-                    break
+                try {
+                    this.environment.addCommandToHistory(command)
+                } finally {
+                    if (io.eofReached) {
+                        try {
+                            this._printEof()
+                        } finally {
+                            break
+                        }
+                    }
+                    if (io.consoleStopRequested) {
+                        try {
+                            this.console.setStyle(ConsoleTextStyle.UTILITY)
+                            this.console.println("Console stopped by action")
+                            this.console.setStyle(ConsoleTextStyle.DEFAULT)
+                        } finally {
+                            break
+                        }
+                    }
                 }
             }
         }
